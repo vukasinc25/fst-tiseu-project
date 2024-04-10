@@ -1,0 +1,11 @@
+APR + CROSO Funkcionalnosti (neke od njih)
+
+APR:
+Vlasnik se login-uje na sajt.
+Vlasnik prijavljuje svoju firmu. (Moze biti prijava fakulteta, osnovnih/srednjih skola, komunikacija sa tim servisima)
+Dobija obrazac koji mora da popuni za prijavljivanje firme.
+Admin vrsi odobrenje firme.
+
+CROSO:
+Vlasnik dobija listu zaposlenih u svojoj firmi (komunikacija sa zaposljavanje servisom).
+Vlasnik prijavljuje svoje zaposlene na CROSO, uplacuje im penziju, zdravstveno osiguranje.
