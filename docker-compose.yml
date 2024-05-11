@@ -1,0 +1,107 @@
+version: "3.8"
+
+services:
+  auth-service:
+    image: auth-service
+    hostname: auth-service
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    restart: always
+    environment:
+      PORT: ${AUTH_SERVICE_PORT}
+      MONGO_DB_URI: ${MONGO_DB_URI}
+      JAEGER_ADDRESS: ${JAEGER_ADDRESS}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - auth_log:/auth
+    networks:
+      - network
+
+  # reservation-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Reservation-service/Dockerfile
+  #   restart: always
+  #   # container_name: "reservation-service"
+  #   image: reservation-service
+  #   hostname: reservation-service
+  #   ports:
+  #     - 8000:8000
+  #   environment:
+  #     # - PORT=8000
+  #     JAEGER_ADDRESS: ${JAEGER_ADDRESS}
+  #   depends_on:
+  #     jaeger:
+  #       condition: service_healthy
+  #   volumes:
+  #     - res_log:/res
+  #   networks:
+  #     - network
+
+  # jaeger:
+  #   image: jaegertracing/all-in-one:latest
+  #   ports:
+  #     - "6831:6831/udp"
+  #     - "16686:16686"
+  #   restart: on-failure
+  #   healthcheck:
+  #     test: [ "CMD", "nc", "-z", "localhost", "16686" ]
+  #     interval: 10s
+  #     retries: 3
+  #     timeout: 5s
+  #   networks:
+  #     - network
+
+  # NOSQL: MongoDB
+  mongo:
+    image: mongo
+    hostname: mongo
+    restart: on-failure
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: mongoDemo
+    # Docker healtcheck - checks if database is "alive"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mongo_store:/data/db
+    networks:
+      - network
+
+  # NoSQL: MongoExpress
+  mongo-express:
+    image: mongo-express
+    restart: always
+    environment:
+      # hostname of mongo databse
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    volumes:
+      - mongo_express_data:/data/db
+    networks:
+      - network
+
+volumes:
+  mongo_store:
+  mongo_express_data:
+  auth_log:
+
+networks:
+  network:
+    driver: bridge
