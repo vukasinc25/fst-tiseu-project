@@ -18,7 +18,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // UserRepo is a repository for MongoDB operations related to User.
@@ -28,12 +27,11 @@ type UserRepo struct {
 	prof_service_string          string
 	reservation_service_string   string
 	accommodation_service_string string
-	tracer                       trace.Tracer
 }
 
 // New creates a new UserRepo instance.
 func New(ctx context.Context, logger *log.Logger, conn_address_string string, conn_reservation_service_address string,
-	conn_accommodation_service_address string, tracer trace.Tracer) (*UserRepo, error) {
+	conn_accommodation_service_address string) (*UserRepo, error) {
 	dbURI := os.Getenv("MONGO_DB_URI")
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbURI))
@@ -47,7 +45,6 @@ func New(ctx context.Context, logger *log.Logger, conn_address_string string, co
 		prof_service_string:          conn_address_string,
 		reservation_service_string:   conn_reservation_service_address,
 		accommodation_service_string: conn_accommodation_service_address,
-		tracer:                       tracer,
 	}, nil
 }
 
@@ -81,8 +78,6 @@ func (uh *UserRepo) Ping() {
 
 // Insert inserts a new user into the MongoDB collection.
 func (uh *UserRepo) Insert(newUser *User, ctx context.Context) (*http.Response, error) {
-	ctx, span := uh.tracer.Start(ctx, "UserRepo.Insert")
-	defer span.End()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -138,8 +133,6 @@ func (uh *UserRepo) Insert(newUser *User, ctx context.Context) (*http.Response, 
 
 // GetAll retrieves all users from the MongoDB collection.
 func (uh *UserRepo) GetAll(ctx context.Context) (Users, error) {
-	ctx, span := uh.tracer.Start(ctx, "UserRepo.GetAll")
-	defer span.End()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -166,8 +159,6 @@ func (uh *UserRepo) GetAll(ctx context.Context) (Users, error) {
 }
 
 func (uh *UserRepo) GetAllReservatinsDatesByHostId(hostId string, ctx context.Context) (*http.Response, error) {
-	ctx, span := uh.tracer.Start(ctx, "UserRepo.Insert")
-	defer span.End()
 
 	url := uh.reservation_service_string + "/api/reservations/for_host_id/" + hostId
 
@@ -192,8 +183,6 @@ func (uh *UserRepo) GetAllReservatinsDatesByHostId(hostId string, ctx context.Co
 }
 
 func (uh *UserRepo) GetAllReservatinsForUser(token string, ctx context.Context) (*http.Response, error) {
-	ctx, span := uh.tracer.Start(ctx, "UserRepo.GetAllReservatinsForUser")
-	defer span.End()
 
 	url := uh.reservation_service_string + "/api/reservations/by_user"
 
@@ -220,9 +209,6 @@ func (uh *UserRepo) GetAllReservatinsForUser(token string, ctx context.Context) 
 
 // GetByUsername retrieves a user by username from the MongoDB collection.
 func (uh *UserRepo) GetByUsername(username string, ctx context.Context) (*User, error) {
-	ctx, span := uh.tracer.Start(ctx, "UserRepo.GetByUsername")
-	defer span.End()
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -243,9 +229,6 @@ func (uh *UserRepo) GetByUsername(username string, ctx context.Context) (*User, 
 }
 
 func (uh *UserRepo) GetById(id string, ctx context.Context) (*Userr, error) {
-	ctx, span := uh.tracer.Start(ctx, "UserRepo.GetById")
-	defer span.End()
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -266,10 +249,7 @@ func (uh *UserRepo) GetById(id string, ctx context.Context) (*Userr, error) {
 	return &user, nil
 }
 
-func (uh *UserRepo) UpdateUsersPassword(user *UserA, ctx context.Context) error { //
-	ctx, span := uh.tracer.Start(ctx, "UserRepo.UpdateUsersPassword")
-	defer span.End()
-
+func (uh *UserRepo) UpdateUsersPassword(user *UserA, ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	userCollection, err := uh.getCollection()

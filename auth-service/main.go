@@ -55,14 +55,6 @@ func main() {
 
 	config := loadConfig()
 
-	//TRACING
-	tracerProvider, err := NewTracerProvider(config["jaeger"])
-	if err != nil {
-		log.Fatal("JaegerTraceProvider failed to Initialize", err)
-	}
-	tracer := tracerProvider.Tracer("auth-service")
-	//
-
 	// Read the port from the environment variable, default to "8000" if not set
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
@@ -88,7 +80,7 @@ func main() {
 	}
 
 	// NoSQL: Initialize auth Repository store
-	store, err := New(timeoutContext, logger, config["conn_service_address"], config["conn_reservation_service_address"], config["conn_accommodation_service_address"], tracer)
+	store, err := New(timeoutContext, logger, config["conn_service_address"], config["conn_reservation_service_address"], config["conn_accommodation_service_address"])
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -98,7 +90,7 @@ func main() {
 	store.Ping()
 
 	// Create a user handler service
-	service := NewUserHandler(logger, store, tokenMaker, tracer)
+	service := NewUserHandler(logger, store, tokenMaker)
 	// subu := InitPubSubUsername()
 	if err != nil {
 		logger.Fatal(err)

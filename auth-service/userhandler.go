@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -10,7 +11,6 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
 
 	// "log"
 	"mime"
@@ -32,12 +32,11 @@ type UserHandler struct {
 	logger   *log.Logger
 	db       *UserRepo
 	jwtMaker token.Maker
-	tracer   trace.Tracer
 }
 
 // NewUserHandler creates a new UserHandler.
-func NewUserHandler(l *log.Logger, r *UserRepo, jwtMaker token.Maker, t trace.Tracer) *UserHandler {
-	return &UserHandler{l, r, jwtMaker, t}
+func NewUserHandler(l *log.Logger, r *UserRepo, jwtMaker token.Maker) *UserHandler {
+	return &UserHandler{l, r, jwtMaker}
 }
 
 func (uh *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
@@ -79,8 +78,8 @@ func (uh *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 
 // createUser handles user creation requests.
 func (uh *UserHandler) createUser(w http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.createUser") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	contentType := req.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
@@ -184,8 +183,8 @@ func (uh *UserHandler) createUser(w http.ResponseWriter, req *http.Request) {
 
 // getAllUsers handles requests to retrieve all users.
 func (uh *UserHandler) getAllUsers(w http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.getAllUsers") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// Retrieve all users from the database
 	users, err := uh.db.GetAll(ctx)
@@ -221,8 +220,8 @@ func (uh *UserHandler) getAllUsers(w http.ResponseWriter, req *http.Request) {
 }
 
 func (uh *UserHandler) GetUserByUsername(w http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.GetUserIdByUsername") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	vars := mux.Vars(req)
 	username := vars["username"]
@@ -244,8 +243,8 @@ func (uh *UserHandler) GetUserByUsername(w http.ResponseWriter, req *http.Reques
 
 // loginUser handles user login requests.
 func (uh *UserHandler) loginUser(w http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.loginUser") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	rt, err := decodeLoginBody(req.Body)
 	if err != nil {
@@ -329,8 +328,8 @@ func (uh *UserHandler) sendEmail(newUser *User, contentStr string, subjectStr st
 }
 
 func (uh *UserHandler) sendForgottenPasswordEmail(w http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.sendForgottenPasswordEmail") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	uh.logger.Println("Usli u sendForgottenPasswordEmail")
 	vars := mux.Vars(req)
@@ -419,8 +418,8 @@ func (uh *UserHandler) isVerificationEmail(newUser *User, randomCode string, isV
 }
 
 func (uh *UserHandler) ChangePassword(res http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.ChangePassword") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	authPayload, ok := ctx.Value(AuthorizationPayloadKey).(*token.Payload)
 	if !ok || authPayload == nil {
@@ -480,8 +479,8 @@ func (uh *UserHandler) ChangePassword(res http.ResponseWriter, req *http.Request
 }
 
 func (uh *UserHandler) changeForgottenPassword(w http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.changeForgottenPassword") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	rt, err := decodeForgottenPasswordBody(req.Body)
 	if err != nil {
@@ -575,8 +574,8 @@ func (uh *UserHandler) changeForgottenPassword(w http.ResponseWriter, req *http.
 }
 
 func (uh *UserHandler) UpdateUser(res http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.UpdateUser") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	authPayload, ok := ctx.Value(AuthorizationPayloadKey).(*token.Payload)
 	if !ok || authPayload == nil {
@@ -658,8 +657,8 @@ func (uh *UserHandler) UpdateUser(res http.ResponseWriter, req *http.Request) {
 }
 
 func (uh *UserHandler) verifyEmail(w http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.Auth") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	vars := mux.Vars(req)
 	code := vars["code"]
@@ -786,8 +785,8 @@ func decodeNewPassword(r io.Reader) (*NewPassword, error) {
 }
 
 func (uh *UserHandler) GetUserById(res http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.GetUserById") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	vars := mux.Vars(req)
 	id := vars["id"]
@@ -858,8 +857,8 @@ func (uh *UserHandler) GetUserById(res http.ResponseWriter, req *http.Request) {
 }
 
 func (uh *UserHandler) DeleteUser(res http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.DeleteUser") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	authPayload, ok := ctx.Value(AuthorizationPayloadKey).(*token.Payload)
 	if !ok || authPayload == nil {
@@ -1112,8 +1111,8 @@ func (uh *UserHandler) DeleteUser(res http.ResponseWriter, req *http.Request) {
 }
 
 func (uh *UserHandler) UpdateUserGrade(res http.ResponseWriter, req *http.Request) {
-	ctx, span := uh.tracer.Start(req.Context(), "UserHandler.UpdateUserGrade") //tracer
-	defer span.End()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	uh.logger.Println("Usli u UpdateGrade")
 	averageGrade, err := decodeAverageGrade(req.Body)
