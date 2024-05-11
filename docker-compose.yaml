@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   auth-service:
@@ -11,6 +11,8 @@ services:
     environment:
       PORT: 8000
       MONGO_DB_URI: mongodb://root:pass@mongo:27017
+    ports:
+      - "8000:8000"
     depends_on:
       mongo:
         condition: service_healthy
