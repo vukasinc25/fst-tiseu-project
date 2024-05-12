@@ -61,6 +61,7 @@ func main() {
 	log.Println("Ovde3: ", service)
 	router.HandleFunc("/users/auth", service.Auth).Methods("GET")
 	router.HandleFunc("/users/create", service.CreateUser).Methods("POST")
+	router.HandleFunc("/users/login", service.LoginUser).Methods("GET")
 
 	// Configure the HTTP server
 	server := &http.Server{Addr: ":8000", Handler: cors(router)}

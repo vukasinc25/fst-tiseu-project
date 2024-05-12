@@ -89,6 +89,26 @@ func (uh *UserRepo) Insert(newUser *model.User, ctx context.Context) error {
 	return nil
 }
 
+func (uh *UserRepo) GetUserByUsername(username string, ctx context.Context) (*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	usersCollection, err := uh.getCollection()
+	if err != nil {
+		log.Println("Error getting collection: ", err)
+		return nil, err
+	}
+	var user model.User
+	log.Println("Querying for user with username: ", username)
+	// objUsername, _ := primitive.ObjectIDFromHex(username)
+	err = usersCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		log.Println("Error decoding user document: ", err)
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (uh *UserRepo) getCollection() (*mongo.Collection, error) {
 	userDatabase := uh.cli.Database("mongoDemo")
 	usersCollection := userDatabase.Collection("users")
