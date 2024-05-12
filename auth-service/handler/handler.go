@@ -9,6 +9,7 @@ import (
 	"mime"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
@@ -23,12 +24,6 @@ type UserHandler struct {
 // NewUserHandler creates a new UserHandler.
 func NewUserHandler(r *repository.UserRepo, jwtMaker token.Maker) *UserHandler {
 	return &UserHandler{r, jwtMaker}
-}
-
-func writeError(w http.ResponseWriter, statusCode int, err error) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
 }
 
 func (uh *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +44,7 @@ func (uh *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If the token verification fails, return an error
 		log.Println("error in token verification")
-		writeError(w, http.StatusUnauthorized, err)
+		sendErrorWithMessage(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -105,6 +100,69 @@ func (uh *UserHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	sendErrorWithMessage(w, "User Created", http.StatusCreated)
 }
 
+func (uh *UserHandler) LoginUser(w http.ResponseWriter, req *http.Request) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	rt, err := decodeLoginBody(req.Body)
+	if err != nil {
+		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	username := rt.Username
+	password := rt.Password
+	user, err := uh.db.GetUserByUsername(username, ctx)
+	if err != nil {
+		log.Println("mongo: no documents in result: treba da se registuje neko")
+		sendErrorWithMessage(w, "No such user", http.StatusBadRequest)
+		return
+	}
+
+	// If user is not found, return an error
+	if user == nil {
+		sendErrorWithMessage(w, "Invalid username or password", http.StatusNotFound)
+		return
+	}
+
+	// Check if the provided password matches the hashed password in the database
+	if !strings.EqualFold(user.Password, password) {
+		sendErrorWithMessage(w, "Password is incorect", http.StatusBadRequest)
+		return
+	}
+
+	// Generate and send JWT token as a response
+	jwtToken(user, w, uh)
+}
+
+func jwtToken(user *model.User, w http.ResponseWriter, uh *UserHandler) {
+	durationStr := "45m"
+	duration, err := time.ParseDuration(durationStr)
+	if err != nil {
+		log.Println("Cannot parse duration")
+		return
+	}
+
+	accessToken, accessPayload, err := uh.jwtMaker.CreateToken(
+		user.ID,
+		user.Username,
+		string(user.Role),
+		duration,
+	)
+
+	if err != nil {
+		sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	rsp := model.LoginUserResponse{
+		AccessToken:          accessToken,
+		AccessTokenExpiresAt: accessPayload.ExpiredAt,
+	}
+
+	e := json.NewEncoder(w)
+	e.Encode(rsp)
+}
+
 func decodeBody(r io.Reader) (*model.User, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
@@ -112,6 +170,18 @@ func decodeBody(r io.Reader) (*model.User, error) {
 	var rt model.User
 	if err := dec.Decode(&rt); err != nil {
 		log.Println("Decode cant be done")
+		return nil, err
+	}
+
+	return &rt, nil
+}
+
+func decodeLoginBody(r io.Reader) (*model.LoginUser, error) {
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+
+	var rt model.LoginUser
+	if err := dec.Decode(&rt); err != nil {
 		return nil, err
 	}
 
