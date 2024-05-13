@@ -40,7 +40,7 @@ func (uh *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(rt.Token)
 
-	payload, err := uh.jwtMaker.VerifyToken(rt.Token)
+	_, err = uh.jwtMaker.VerifyToken(rt.Token)
 	if err != nil {
 		// If the token verification fails, return an error
 		log.Println("error in token verification")
@@ -48,15 +48,18 @@ func (uh *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respBytes, err := json.Marshal(payload.ID)
-	if err != nil {
-		log.Println("error while creating response")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	// respBytes, err := json.Marshal("Authentification successfuly")
+	// if err != nil {
+	// 	log.Println("error while creating response")
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	return
+	// }
 
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(respBytes)
+	// log.Println("Response: ", respBytes)
+
+	// w.Header().Add("Content-Type", "application/json")
+	// w.Write()
+	sendErrorWithMessage(w, "Valid", http.StatusOK)
 
 }
 
