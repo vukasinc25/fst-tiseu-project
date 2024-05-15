@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -26,6 +27,7 @@ func main() {
 
 	// Initialize Gorilla Mux router and CORS middleware
 	router := mux.NewRouter()
+	router.StrictSlash(true)
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
 
 	// Initialize loggers with prefixes for different components
@@ -52,32 +54,28 @@ func main() {
 
 	// Create a user handler service
 	service := handler.NewUserHandler(store, tokenMaker)
-	// subu := InitPubSubUsername()
 	if err != nil {
 		log.Println("Ovde2: ", err)
 	}
 
 	log.Println("Ovde3: ", service)
-	router.HandleFunc("/api/users/auth", service.Auth).Methods("GET")
+	router.HandleFunc("/users/auth", service.Auth).Methods("POST")
+	router.HandleFunc("/users/create", service.CreateUser).Methods("POST")
+	router.HandleFunc("/users/login", service.LoginUser).Methods("GET")
 
 	// Configure the HTTP server
-	server := http.Server{
-		Addr:         ":" + port,
-		Handler:      cors(router),
-		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
+	server := &http.Server{Addr: ":8000", Handler: cors(router)}
 
 	// Print a message indicating the server is listening
 	log.Println("Server listening on port", port)
 
 	// Start the HTTP server in a goroutine
 	go func() {
-		err := server.ListenAndServe()
-		// err := server.ListenAndServeTLS("/cert/auth-service.crt", "/cert/auth-service.key")
-		if err != nil {
-			log.Println("Ovde4: ", err)
+		log.Println("server starting")
+		if err := server.ListenAndServe(); err != nil {
+			if err != http.ErrServerClosed {
+				log.Fatal(err)
+			}
 		}
 	}()
 
@@ -103,4 +101,15 @@ func loadConfig() map[string]string {
 	config := make(map[string]string)
 	config["conn_service_address"] = fmt.Sprintf("http://%s:%s", os.Getenv("PROF_SERVICE_HOST"), os.Getenv("PROF_SERVICE_PORT"))
 	return config
+}
+
+func CreateUser(w http.ResponseWriter, req *http.Request) {
+	sendErrorWithMessage(w, "User Created", http.StatusCreated)
+}
+
+func sendErrorWithMessage(w http.ResponseWriter, message string, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	errorResponse := map[string]string{"message": message}
+	json.NewEncoder(w).Encode(errorResponse)
 }

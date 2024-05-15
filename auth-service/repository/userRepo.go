@@ -7,6 +7,7 @@ import (
 
 	"time"
 
+	"github.com/vukasinc25/fst-tiseu-project/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -68,59 +69,73 @@ func (uh *UserRepo) Ping() {
 }
 
 // Insert inserts a new user into the MongoDB collection.
-// func (uh *UserRepo) Insert(newUser *User, ctx context.Context) (*http.Response, error) {
+func (uh *UserRepo) Insert(newUser *model.User, ctx context.Context) error {
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
-// 	usersCollection, err := uh.getCollection()
-// 	if err != nil {
-// 		log.Println("Duplicate key error: ", err)
-// 		return nil, err
-// 	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	usersCollection, err := uh.getCollection()
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return err
+	}
 
-// 	userA := uh.decodeUserA(newUser)
+	result, err := usersCollection.InsertOne(ctx, newUser)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Printf("Document ID: %v\n", result.InsertedID)
 
-// 	result, err := usersCollection.InsertOne(ctx, userA)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return nil, err
-// 	}
-// 	uh.logger.Printf("Document ID: %v\n", result.InsertedID)
+	return nil
+}
 
-// 	url := uh.prof_service_string + "/api/prof/create"
+func (uh *UserRepo) GetUserByUsername(username string, ctx context.Context) (*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-// 	insertedID := result.InsertedID.(primitive.ObjectID).Hex()
-// 	log.Println("User: ", insertedID)
+	usersCollection, err := uh.getCollection()
+	if err != nil {
+		log.Println("Error getting collection: ", err)
+		return nil, err
+	}
+	var user model.User
+	log.Println("Querying for user with username: ", username)
+	// objUsername, _ := primitive.ObjectIDFromHex(username)
+	err = usersCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		log.Println("Error decoding user document: ", err)
+		return nil, err
+	}
+	return &user, nil
+}
 
-// 	userB := uh.decodeUserB(insertedID, newUser)
-// 	reqBody, err := json.Marshal(userB)
-// 	if err != nil {
-// 		fmt.Println("Error marshaling JSON:", err)
-// 		return nil, err
-// 	}
+func (uh *UserRepo) getCollection() (*mongo.Collection, error) {
+	userDatabase := uh.cli.Database("mongoDemo")
+	usersCollection := userDatabase.Collection("users")
 
-// 	log.Println("Url:", url)
-// 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	username := mongo.IndexModel{
+		Keys:    bson.D{{Key: "username", Value: 1}},
+		Options: options.Index().SetUnique(true),
+	}
 
-// 	req.Header.Set("Content-Type", "application/json")
+	_, err := usersCollection.Indexes().CreateOne(context.TODO(), username)
+	if err != nil {
+		log.Println("Error in creatingOne unique username index")
+		return nil, err
+	}
 
-// 	tr := http.DefaultTransport.(*http.Transport).Clone()
-// 	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	email := mongo.IndexModel{
+		Keys:    bson.D{{Key: "email", Value: 1}},
+		Options: options.Index().SetUnique(true),
+	}
 
-// 	client := http.Client{Transport: tr}
-// 	httpResp, err := client.Do(req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	// httpResp, err := http.DefaultClient.Do(req)
-// 	// if err != nil {
-// 	// 	return nil, err
-// 	// }
-// 	return httpResp, nil
-// }
+	_, err = usersCollection.Indexes().CreateOne(context.TODO(), email)
+	if err != nil {
+		log.Println("Error in creatingOne unique email index")
+		return nil, err
+	}
+	return usersCollection, nil
+}
 
 // // GetAll retrieves all users from the MongoDB collection.
 // func (uh *UserRepo) GetAll(ctx context.Context) (Users, error) {
