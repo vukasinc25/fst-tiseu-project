@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/vukasinc25/fst-tiseu-projet/handler"
-	"github.com/vukasinc25/fst-tiseu-projet/middleware"
-	"github.com/vukasinc25/fst-tiseu-projet/repository"
+	"github.com/vukasinc25/fst-tiseu-project/handler"
+	"github.com/vukasinc25/fst-tiseu-project/middleware"
+	"github.com/vukasinc25/fst-tiseu-project/repository"
 )
 
 func main() {
@@ -22,11 +22,17 @@ func main() {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
-	newRepository, err := repository.New(context.Background())
+	timeoutContext, cancel := context.WithTimeout(context.Background(), 50*time.Second)
+	defer cancel()
+
+	newRepository, err := repository.New(timeoutContext)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	defer newRepository.Disconnect(timeoutContext)
+
+	newRepository.Ping()
 
 	server, err := handler.NewHandler(newRepository)
 	if err != nil {
@@ -35,7 +41,7 @@ func main() {
 	}
 
 	router.Use(GlobalMiddleware)
-	router.HandleFunc("/", server.CreateUser).Methods("POST")
+	router.HandleFunc("fakultet/create", server.CreateCompetition).Methods("POST")
 
 	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: router}
 	go func() {
@@ -51,7 +57,6 @@ func main() {
 
 	log.Println("service shutting down ...")
 
-	// gracefully stop server
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -63,7 +68,6 @@ func main() {
 
 func GlobalMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Call the TokenMiddleware for every request
 		middleware.TokenMiddleware(next.ServeHTTP).ServeHTTP(w, r)
 	})
 }
