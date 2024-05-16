@@ -51,7 +51,7 @@ func (lh *ListingHandler) CreateJobListing(w http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	sendErrorWithMessage(w, "BAS NE VALJA", http.StatusCreated)
+	//sendErrorWithMessage(w, "BAS NE VALJA", http.StatusCreated)
 }
 
 func decodeBody(r io.Reader) (*model.JobListing, error) {
