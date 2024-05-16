@@ -1,12 +1,12 @@
 version: "3.8"
 
 services:
-  aprcroso:
-    image: aprcroso
-    hostname: aprcoso
+  apr-croso:
+    image: apr-coso
+    hostname: apr-coso
     build:
       context: .
-      dockerfile: ./aprcoso/Dockerfile
+      dockerfile: ./apr-croso/Dockerfile
     restart: always
     environment:
       PORT: 8004
