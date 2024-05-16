@@ -3,24 +3,27 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"github.com/vukasinc25/fst-tiseu-project/model"
+	"github.com/vukasinc25/fst-tiseu-project/repository"
 	"io"
 	"log"
 	"mime"
 	"net/http"
-
-	"github.com/vukasinc25/fst-tiseu-project/model"
-	"github.com/vukasinc25/fst-tiseu-project/repository"
+	"strings"
 )
 
-type newHandler struct {
-	repo *repository.NewRepository
+type ListingHandler struct {
+	logger *log.Logger
+	repo   *repository.ListingRepository
 }
 
-func NewHandler(r *repository.NewRepository) (*newHandler, error) {
-	return &newHandler{r}, nil
+func NewHandler(l *log.Logger, r *repository.ListingRepository) (*ListingHandler, error) {
+	return &ListingHandler{l, r}, nil
 }
 
-func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request) {
+type KeyProduct struct{}
+
+func (lh *ListingHandler) CreateJobListing(w http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -35,30 +38,27 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	rt, err := decodeCompetitionBody(req.Body)
+	jobListing, err := decodeBody(req.Body)
+
+	err = lh.repo.Insert(jobListing)
 	if err != nil {
-		log.Println("Decode: ", err)
-		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
+		lh.logger.Println("error:1", err.Error())
+		if strings.Contains(err.Error(), "duplicate key") {
+			sendErrorWithMessage(w, "accommodation with that name already exists", http.StatusBadRequest)
+			return
+		}
+		sendErrorWithMessage(w, "NE VALJA", http.StatusBadRequest)
 		return
 	}
 
-	log.Println("User: ", rt)
-
-	err = nh.repo.CreateCompetition(rt)
-	if err != nil {
-		log.Println(err)
-		sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	sendErrorWithMessage(w, "User Created", http.StatusCreated)
+	//sendErrorWithMessage(w, "BAS NE VALJA", http.StatusCreated)
 }
 
-func decodeCompetitionBody(r io.Reader) (*model.Competition, error) {
+func decodeBody(r io.Reader) (*model.JobListing, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
 
-	var rt model.Competition
+	var rt model.JobListing
 	if err := dec.Decode(&rt); err != nil {
 		log.Println("Decode cant be done")
 		return nil, err

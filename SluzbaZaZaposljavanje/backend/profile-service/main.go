@@ -2,17 +2,16 @@ package main
 
 import (
 	"context"
+	"github.com/gorilla/mux"
+	"github.com/vukasinc25/fst-tiseu-project/handler"
+	"github.com/vukasinc25/fst-tiseu-project/middleware"
+	"github.com/vukasinc25/fst-tiseu-project/repository"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/gorilla/mux"
-	"github.com/vukasinc25/fst-tiseu-project/handler"
-	"github.com/vukasinc25/fst-tiseu-project/middleware"
-	"github.com/vukasinc25/fst-tiseu-project/repository"
 )
 
 func main() {
@@ -22,28 +21,24 @@ func main() {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
-	timeoutContext, cancel := context.WithTimeout(context.Background(), 50*time.Second)
-	defer cancel()
+	logger := log.New(os.Stdout, "[profile-api] ", log.LstdFlags)
 
-	newRepository, err := repository.New(timeoutContext)
+	newRepository, err := repository.New(context.Background(), logger)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	defer newRepository.Disconnect(timeoutContext)
 
-	newRepository.Ping()
-
-	server, err := handler.NewHandler(newRepository)
+	server, err := handler.NewHandler(logger, newRepository)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
 	router.Use(GlobalMiddleware)
-	router.HandleFunc("fakultet/create", server.CreateCompetition).Methods("POST")
+	router.HandleFunc("/createUser", server.CreateUser).Methods("POST")
 
-	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: router}
+	srv := &http.Server{Addr: "0.0.0.0:8011", Handler: router}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
@@ -57,6 +52,7 @@ func main() {
 
 	log.Println("service shutting down ...")
 
+	// gracefully stop server
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
