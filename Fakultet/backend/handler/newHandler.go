@@ -10,6 +10,7 @@ import (
 
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type newHandler struct {
@@ -21,6 +22,7 @@ func NewHandler(r *repository.NewRepository) (*newHandler, error) {
 }
 
 func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u Create")
 	contentType := req.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -42,7 +44,9 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	log.Println("User: ", rt)
+	rt.ID = primitive.NewObjectID()
+
+	log.Println("Competition: ", rt)
 
 	err = nh.repo.CreateCompetition(rt)
 	if err != nil {
@@ -51,7 +55,7 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	sendErrorWithMessage(w, "User Created", http.StatusCreated)
+	sendErrorWithMessage(w, "Competition Created", http.StatusCreated)
 }
 
 func decodeCompetitionBody(r io.Reader) (*model.Competition, error) {

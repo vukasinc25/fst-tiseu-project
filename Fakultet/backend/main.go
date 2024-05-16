@@ -40,8 +40,8 @@ func main() {
 		return
 	}
 
-	router.Use(GlobalMiddleware)
-	router.HandleFunc("fakultet/create", server.CreateCompetition).Methods("POST")
+	// router.Use(GlobalMiddleware)
+	router.HandleFunc("/fakultet/create", server.CreateCompetition).Methods("POST")
 
 	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: router}
 	go func() {
