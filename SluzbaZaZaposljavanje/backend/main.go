@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/handler"
+	"github.com/vukasinc25/fst-tiseu-project/repository"
 	"log"
 	"net/http"
 	"os"
@@ -33,7 +34,7 @@ func main() {
 
 	router.HandleFunc("/", server.CreateUser).Methods("POST")
 
-	srv := &http.Server{Addr: "0.0.0.0:8000", Handler: router}
+	srv := &http.Server{Addr: "0.0.0.0:8003", Handler: router}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
