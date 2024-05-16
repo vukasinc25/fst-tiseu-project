@@ -56,19 +56,36 @@ func (lr *ListingRepository) Ping() {
 	fmt.Println(databases)
 }
 
-func (lr *ListingRepository) GetAll(ctx context.Context) (model.Users, error) {
+func (lr *ListingRepository) Insert(jobListing *model.JobListing) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	jobListingCollection := lr.getCollection()
+	//if err != nil {
+	//	return errors.New("error in getting jobListing collection")
+	//}
+
+	result, err := jobListingCollection.InsertOne(ctx, &jobListing)
+	if err != nil {
+		log.Println("Errsor when tryed to insert jobListing: ", err)
+		return err
+	}
+	log.Printf("Documents ID: %v\n", result.InsertedID)
+	return nil
+}
+
+func (lr *ListingRepository) GetAll(ctx context.Context) (model.JobListings, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	notificationCollection := lr.getCollection()
+	jobListingCollection := lr.getCollection()
 
-	var users model.Users
-	notificationCursor, err := notificationCollection.Find(ctx, bson.M{})
+	var users model.JobListings
+	jobListingCursor, err := jobListingCollection.Find(ctx, bson.M{})
 	if err != nil {
 		lr.logger.Println(err)
 		return nil, err
 	}
-	if err = notificationCursor.All(ctx, &users); err != nil {
+	if err = jobListingCursor.All(ctx, &users); err != nil {
 		lr.logger.Println(err)
 		return nil, err
 	}
@@ -77,6 +94,6 @@ func (lr *ListingRepository) GetAll(ctx context.Context) (model.Users, error) {
 
 func (lr *ListingRepository) getCollection() *mongo.Collection {
 	patientDatabase := lr.cli.Database("mongoDemo")
-	patientsCollection := patientDatabase.Collection("listings")
+	patientsCollection := patientDatabase.Collection("jobListings")
 	return patientsCollection
 }
