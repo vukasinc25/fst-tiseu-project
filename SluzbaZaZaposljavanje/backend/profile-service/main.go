@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/handler"
+	"github.com/vukasinc25/fst-tiseu-project/middleware"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
 	"log"
 	"net/http"
@@ -34,6 +35,7 @@ func main() {
 		return
 	}
 
+	router.Use(GlobalMiddleware)
 	router.HandleFunc("/createUser", server.CreateUser).Methods("POST")
 
 	srv := &http.Server{Addr: "0.0.0.0:8011", Handler: router}
@@ -58,4 +60,10 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("server stopped")
+}
+
+func GlobalMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		middleware.TokenMiddleware(next.ServeHTTP).ServeHTTP(w, r)
+	})
 }
