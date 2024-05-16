@@ -8,5 +8,5 @@ RUN go build -o server
 FROM alpine
 WORKDIR /usr/bin
 COPY --from=build_container /app/server .
-EXPOSE 8003
+EXPOSE 8004
 ENTRYPOINT ["server"]

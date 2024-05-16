@@ -1,6 +1,26 @@
 version: "3.8"
 
 services:
+  aprcroso:
+    image: aprcroso
+    hostname: aprcoso
+    build:
+      context: .
+      dockerfile: ./aprcoso/Dockerfile
+    restart: always
+    environment:
+      PORT: 8004
+      MONGO_DB_URI: mongodb://root:pass@mongo:27017
+    ports:
+      - "8004:8004"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - auth_log:/auth
+    networks:
+      - network
+
   auth-service:
     image: auth-service
     hostname: auth-service

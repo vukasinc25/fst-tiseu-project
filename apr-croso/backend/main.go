@@ -11,7 +11,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/handler"
-	"github.com/vukasinc25/fst-tiseu-project/middleware"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
 )
 
@@ -40,10 +39,10 @@ func main() {
 		return
 	}
 
-	router.Use(GlobalMiddleware)
+
 	router.HandleFunc("aprcroso/createFirm", server.CreateFirm).Methods("POST")
 
-	srv := &http.Server{Addr: "0.0.0.0:8003", Handler: router}
+	srv := &http.Server{Addr: "0.0.0.0:8004", Handler: router}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
@@ -66,8 +65,3 @@ func main() {
 	log.Println("server stopped")
 }
 
-func GlobalMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		middleware.TokenMiddleware(next.ServeHTTP).ServeHTTP(w, r)
-	})
-}

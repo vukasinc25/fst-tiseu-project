@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/vukasinc25/fst-tiseu-project/model"
-	"github.com/vukasinc25/fst-tiseu-projet/repository"
+	"github.com/vukasinc25/fst-tiseu-project/repository"
 )
 
 type newHandler struct {

@@ -7,7 +7,7 @@ const (
 	ADMIN   Role = "ADMIN"
 )
 
-type user struct {
+type User struct {
 	ID        string `bson:"id" json:"id"`
 	FirstName string `bson:"firstName" json:"firstName"`
 	LastName  string `bson:"lastName" json:"lastName"`
