@@ -37,6 +37,24 @@ services:
     networks:
       - network
 
+  zaposljavanje:
+    image: zaposljavanje
+    hostname: zaposljavanje
+    build:
+      context: .
+      dockerfile: SluzbaZaZaposljavanje/backend/Dockerfile
+    restart: always
+    environment:
+      PORT: 8003
+      MONGO_DB_URI: mongodb://root:pass@mongo:27017
+    ports:
+      - "8003:8003"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - network
+
   mongo:
     image: mongo
     hostname: mongo
