@@ -7,16 +7,16 @@ import (
 )
 
 type Competition struct {
-	ID                   primitive.ObjectID
-	ProgramName          string
-	AdmissionRequrements string
-	ExamDate             time.Time
-	ExamFormat           string
-	ExamMaterials        string
-	ApplicationDeadlines string
-	ApplicationDocuments string
-	ApplicationMethod    string
-	ApplicationContact   string
-	TutionFees           string
-	ContactInformation   string
+	ID                    primitive.ObjectID `bson:"_id" json:"_id"`
+	ProgramName           string             `bson:"programName" json:"programName"`
+	AdmissionRequirements string             `bson:"admissionRequirements" json:"admissionRequirements"`
+	ExamDate              time.Time          `bson:"examDate" json:"examDate"`
+	ExamFormat            string             `bson:"examFormat" json:"examFormat"`
+	ExamMaterials         string             `bson:"examMaterials" json:"examMaterials"`
+	ApplicationDeadlines  string             `bson:"applicationDeadlines" json:"applicationDeadlines"`
+	ApplicationDocuments  string             `bson:"applicationDocuments" json:"applicationDocuments"`
+	ApplicationMethod     string             `bson:"applicationMethod" json:"applicationMethod"`
+	ApplicationContact    string             `bson:"applicationContact" json:"applicationContact"`
+	TuitionFees           string             `bson:"tuitionFees" json:"tuitionFees"`
+	ContactInformation    string             `bson:"contactInformation" json:"contactInformation"`
 }
