@@ -61,15 +61,15 @@ func (pr *ProfileRepository) GetAll(ctx context.Context) (model.Users, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	notificationCollection := pr.getCollection()
+	profileCollection := pr.getCollection()
 
 	var users model.Users
-	notificationCursor, err := notificationCollection.Find(ctx, bson.M{})
+	profileCursor, err := profileCollection.Find(ctx, bson.M{})
 	if err != nil {
 		pr.logger.Println(err)
 		return nil, err
 	}
-	if err = notificationCursor.All(ctx, &users); err != nil {
+	if err = profileCursor.All(ctx, &users); err != nil {
 		pr.logger.Println(err)
 		return nil, err
 	}
@@ -80,16 +80,16 @@ func (pr *ProfileRepository) GetAllByHostId(id string, ctx context.Context) (mod
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	notificationCollection := pr.getCollection()
+	profileCollection := pr.getCollection()
 
 	var users model.Users
 	//objID, _ := primitive.ObjectIDFromHex(id)
-	notificationCursor, err := notificationCollection.Find(ctx, bson.D{{"hostId", id}})
+	profileCursor, err := profileCollection.Find(ctx, bson.D{{"hostId", id}})
 	if err != nil {
 		pr.logger.Println(err)
 		return nil, err
 	}
-	if err = notificationCursor.All(ctx, &users); err != nil {
+	if err = profileCursor.All(ctx, &users); err != nil {
 		pr.logger.Println(err)
 		return nil, err
 	}
@@ -116,11 +116,11 @@ func (pr *ProfileRepository) GetById(id string, ctx context.Context) (*model.Use
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	notificationCollection := pr.getCollection()
+	profileCollection := pr.getCollection()
 
 	var user model.User
 	objID, _ := primitive.ObjectIDFromHex(id)
-	err := notificationCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&user)
+	err := profileCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&user)
 	if err != nil {
 		pr.logger.Println(err)
 		return nil, err

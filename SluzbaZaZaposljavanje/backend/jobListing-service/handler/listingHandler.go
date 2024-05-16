@@ -3,10 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
+	"io"
 	"log"
 	"mime"
 	"net/http"
+	"strings"
 )
 
 type ListingHandler struct {
@@ -18,7 +21,9 @@ func NewHandler(l *log.Logger, r *repository.ListingRepository) (*ListingHandler
 	return &ListingHandler{l, r}, nil
 }
 
-func (*ListingHandler) CreateJobListing(w http.ResponseWriter, req *http.Request) {
+type KeyProduct struct{}
+
+func (lh *ListingHandler) CreateJobListing(w http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -33,7 +38,33 @@ func (*ListingHandler) CreateJobListing(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	sendErrorWithMessage(w, "User Created", http.StatusCreated)
+	jobListing, err := decodeBody(req.Body)
+
+	err = lh.repo.Insert(jobListing)
+	if err != nil {
+		lh.logger.Println("error:1", err.Error())
+		if strings.Contains(err.Error(), "duplicate key") {
+			sendErrorWithMessage(w, "accommodation with that name already exists", http.StatusBadRequest)
+			return
+		}
+		sendErrorWithMessage(w, "NE VALJA", http.StatusBadRequest)
+		return
+	}
+
+	sendErrorWithMessage(w, "BAS NE VALJA", http.StatusCreated)
+}
+
+func decodeBody(r io.Reader) (*model.JobListing, error) {
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+
+	var rt model.JobListing
+	if err := dec.Decode(&rt); err != nil {
+		log.Println("Decode cant be done")
+		return nil, err
+	}
+
+	return &rt, nil
 }
 
 func sendErrorWithMessage(w http.ResponseWriter, message string, statusCode int) {

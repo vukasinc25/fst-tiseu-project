@@ -34,7 +34,7 @@ func main() {
 		return
 	}
 
-	router.HandleFunc("/", server.CreateUser).Methods("POST")
+	router.HandleFunc("/createUser", server.CreateUser).Methods("POST")
 
 	srv := &http.Server{Addr: "0.0.0.0:8011", Handler: router}
 	go func() {
