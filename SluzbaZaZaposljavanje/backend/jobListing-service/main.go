@@ -20,21 +20,23 @@ func main() {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
-	newRepository, err := repository.New(context.Background())
+	logger := log.New(os.Stdout, "[jobListing-api] ", log.LstdFlags)
+
+	newRepository, err := repository.New(context.Background(), logger)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	server, err := handler.NewHandler(newRepository)
+	server, err := handler.NewHandler(logger, newRepository)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	router.HandleFunc("/", server.CreateUser).Methods("POST")
+	router.HandleFunc("/createJobListing", server.CreateJobListing).Methods("POST")
 
-	srv := &http.Server{Addr: "0.0.0.0:8003", Handler: router}
+	srv := &http.Server{Addr: "0.0.0.0:8012", Handler: router}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
