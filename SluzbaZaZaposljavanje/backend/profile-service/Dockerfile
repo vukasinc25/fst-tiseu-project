@@ -1,8 +1,8 @@
 FROM golang:alpine as build_container
 WORKDIR /app
-COPY ./SluzbaZaZaposljavanje/backend/go.mod ./SluzbaZaZaposljavanje/backend/go.sum ./
+COPY ./SluzbaZaZaposljavanje/backend/profile-service/go.mod ./SluzbaZaZaposljavanje/backend/profile-service/go.sum ./
 RUN go mod download
-COPY ./SluzbaZaZaposljavanje/backend ./
+COPY ./SluzbaZaZaposljavanje/backend/profile-service ./
 RUN go build -o server
 
 FROM alpine

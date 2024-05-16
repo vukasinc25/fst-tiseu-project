@@ -37,18 +37,37 @@ services:
     networks:
       - network
 
-  zaposljavanje:
-    image: zaposljavanje
-    hostname: zaposljavanje
+  #SLUZBA ZA ZAPOSLJAVANJE
+  profile-service:
+    image: profile-service
+    hostname: profile-service
     build:
       context: .
-      dockerfile: SluzbaZaZaposljavanje/backend/Dockerfile
+      dockerfile: SluzbaZaZaposljavanje/backend/profile-service/Dockerfile
     restart: always
     environment:
-      PORT: 8003
+      PORT: 8011
       MONGO_DB_URI: mongodb://root:pass@mongo:27017
     ports:
-      - "8003:8003"
+      - "8011:8011"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - network
+
+  joblisting-service:
+    image: joblisting-service
+    hostname: joblisting-service
+    build:
+      context: .
+      dockerfile: SluzbaZaZaposljavanje/backend/jobListing-service/Dockerfile
+    restart: always
+    environment:
+      PORT: 8012
+      MONGO_DB_URI: mongodb://root:pass@mongo:27017
+    ports:
+      - "8012:8012"
     depends_on:
       mongo:
         condition: service_healthy

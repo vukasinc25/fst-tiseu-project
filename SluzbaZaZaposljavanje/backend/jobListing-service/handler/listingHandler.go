@@ -9,16 +9,16 @@ import (
 	"net/http"
 )
 
-type SluzbaHandler struct {
+type ListingHandler struct {
 	logger *log.Logger
-	repo   *repository.ZaposljavanjeRepository
+	repo   *repository.ListingRepository
 }
 
-func NewHandler(l *log.Logger, r *repository.ZaposljavanjeRepository) (*SluzbaHandler, error) {
-	return &SluzbaHandler{l, r}, nil
+func NewHandler(l *log.Logger, r *repository.ListingRepository) (*ListingHandler, error) {
+	return &ListingHandler{l, r}, nil
 }
 
-func (*SluzbaHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
+func (*ListingHandler) CreateJobListing(w http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -35,19 +35,6 @@ func (*SluzbaHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 
 	sendErrorWithMessage(w, "User Created", http.StatusCreated)
 }
-
-// func decodeBody(r io.Reader) (*model.User, error) {
-// 	dec := json.NewDecoder(r)
-// 	dec.DisallowUnknownFields()
-
-// 	var rt model.User
-// 	if err := dec.Decode(&rt); err != nil {
-// 		log.Println("Decode cant be done")
-// 		return nil, err
-// 	}
-
-// 	return &rt, nil
-// }
 
 func sendErrorWithMessage(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
