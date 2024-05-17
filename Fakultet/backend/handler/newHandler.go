@@ -139,7 +139,7 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 	}
 
 	sendErrorWithMessage(w, "Competition Created", http.StatusCreated)
-}
+
 
 func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateRegistrationUserToCompetition")
@@ -193,7 +193,7 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 
 	sendErrorWithMessage(w, "User successfuly registerd to the competition", http.StatusCreated)
 }
-
+  
 func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u GetDiplomaByUserId")
 
@@ -208,6 +208,7 @@ func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Reques
 	log.Println("Payload: ", authPayload)
 
 	id := authPayload.ID.Hex()
+	id = strings.Trim(id, "\"")
 	log.Println("Id: ", id)
 
 	diploma, err := nh.repo.GetDiplomaByUserId(id)
@@ -222,7 +223,6 @@ func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Reques
 		log.Println("Error encoding diploma to JSON:", err)
 		sendErrorWithMessage(w, "Error encoding response", http.StatusInternalServerError)
 	}
-
 }
 
 func decodeCompetitionBody(r io.Reader) (*model.Competition, error) {
