@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime"
 	"net/http"
@@ -141,37 +143,53 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 
 func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateRegistrationUserToCompetition")
-	contentType := req.Header.Get("Content-Type")
-	mediatype, _, err := mime.ParseMediaType(contentType)
+
+	ctx := req.Context()
+
+	token, ok := ctx.Value("accessToken").(string)
+	if !ok || token == "" {
+		sendErrorWithMessage(w, "Authorization token not found", http.StatusInternalServerError)
+		return
+	}
+
+	// rt.ID = primitive.NewObjectID()
+
+	log.Println("Token: ", token)
+
+	req.Header.Set("Content-Type", "application/json")
+
+	// Set the Authorization header with the Bearer token
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	url := "http://"
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Println("Error cant mimi.ParseMediaType")
-		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+		fmt.Println("Error creating request:", err)
 		return
 	}
 
-	if mediatype != "application/json" {
-		err := errors.New("expect application/json Content-Type")
-		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
-		return
-	}
-
-	rt, err := decodeRegistrationOfUserToCompetitionBody(req.Body)
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Decode: ", err)
-		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
+		fmt.Println("Error sending request:", err)
 		return
 	}
+	defer resp.Body.Close()
 
-	rt.ID = primitive.NewObjectID()
-
-	log.Println("Competition: ", rt)
-
-	err = nh.repo.CreateRegisteredStudentToTheCommpetition(rt)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
-		sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
+		fmt.Println("Error reading response body:", err)
 		return
 	}
+
+	log.Println("Body: ", body)
+
+	// err = nh.repo.CreateRegisteredStudentToTheCommpetition(rt)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	sendErrorWithMessage(w, "User successfuly registerd to the competition", http.StatusCreated)
 }
@@ -191,8 +209,6 @@ func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Reques
 
 	id := authPayload.ID.Hex()
 	log.Println("Id: ", id)
-
-	// id := "6646761f9e10566e77913d79"
 
 	diploma, err := nh.repo.GetDiplomaByUserId(id)
 	if err != nil {

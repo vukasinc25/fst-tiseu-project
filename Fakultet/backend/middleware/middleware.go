@@ -76,6 +76,7 @@ func TokenMiddleware(tokenMaker token.Maker) mux.MiddlewareFunc {
 
 			// Store the payload in the request context
 			ctx := context.WithValue(r.Context(), "authorization_payload", payload)
+			ctx = context.WithValue(r.Context(), "accessToken", tokenS)
 			r = r.WithContext(ctx)
 
 			// Call the next handler in the chain
