@@ -13,53 +13,53 @@ import (
 	"time"
 )
 
-type ListingRepository struct {
+type JobRepository struct {
 	cli    *mongo.Client
 	logger *log.Logger
 }
 
-func New(ctx context.Context, logger *log.Logger) (*ListingRepository, error) {
+func New(ctx context.Context, logger *log.Logger) (*JobRepository, error) {
 	dburi := os.Getenv("MONGO_DB_URI")
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dburi))
 	if err != nil {
 		return nil, err
 	}
-	return &ListingRepository{
+	return &JobRepository{
 		cli: client, logger: logger,
 	}, nil
 }
 
-func (lr *ListingRepository) Disconnect(ctx context.Context) error {
-	err := lr.cli.Disconnect(ctx)
+func (jr *JobRepository) Disconnect(ctx context.Context) error {
+	err := jr.cli.Disconnect(ctx)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (lr *ListingRepository) Ping() {
+func (jr *JobRepository) Ping() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	// Check connection -> if no error, connection is established
-	err := lr.cli.Ping(ctx, readpref.Primary())
+	err := jr.cli.Ping(ctx, readpref.Primary())
 	if err != nil {
-		lr.logger.Println(err)
+		jr.logger.Println(err)
 	}
 
 	// Print available databases
-	databases, err := lr.cli.ListDatabaseNames(ctx, bson.M{})
+	databases, err := jr.cli.ListDatabaseNames(ctx, bson.M{})
 	if err != nil {
-		lr.logger.Println(err)
+		jr.logger.Println(err)
 	}
 	fmt.Println(databases)
 }
 
-func (lr *ListingRepository) Insert(jobListing *model.JobListing) error {
+func (jr *JobRepository) InsertJobListing(jobListing *model.JobListing) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	jobListingCollection := lr.getCollection()
+	jobListingCollection := jr.getJobListingCollection()
 	//if err != nil {
 	//	return errors.New("error in getting jobListing collection")
 	//}
@@ -73,27 +73,50 @@ func (lr *ListingRepository) Insert(jobListing *model.JobListing) error {
 	return nil
 }
 
-func (lr *ListingRepository) GetAll(ctx context.Context) (model.JobListings, error) {
+func (jr *JobRepository) InsertJobApplication(jobApplication *model.JobApplication) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	jobApplicationCollection := jr.getJobApplicationCollection()
+	//if err != nil {
+	//	return errors.New("error in getting jobListing collection")
+	//}
+
+	result, err := jobApplicationCollection.InsertOne(ctx, &jobApplication)
+	if err != nil {
+		log.Println("Error when tried to insert jobApplication: ", err)
+		return err
+	}
+	log.Printf("Documents ID: %v\n", result.InsertedID)
+	return nil
+}
+
+func (jr *JobRepository) GetAllJobListings() (model.JobListings, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	jobListingCollection := lr.getCollection()
+	jobListingCollection := jr.getJobListingCollection()
 
 	var users model.JobListings
 	jobListingCursor, err := jobListingCollection.Find(ctx, bson.M{})
 	if err != nil {
-		lr.logger.Println(err)
+		jr.logger.Println(err)
 		return nil, err
 	}
 	if err = jobListingCursor.All(ctx, &users); err != nil {
-		lr.logger.Println(err)
+		jr.logger.Println(err)
 		return nil, err
 	}
 	return users, nil
 }
 
-func (lr *ListingRepository) getCollection() *mongo.Collection {
-	patientDatabase := lr.cli.Database("mongoDemo")
+func (jr *JobRepository) getJobListingCollection() *mongo.Collection {
+	patientDatabase := jr.cli.Database("mongoDemo")
 	patientsCollection := patientDatabase.Collection("jobListings")
+	return patientsCollection
+}
+
+func (jr *JobRepository) getJobApplicationCollection() *mongo.Collection {
+	patientDatabase := jr.cli.Database("mongoDemo")
+	patientsCollection := patientDatabase.Collection("jobApplications")
 	return patientsCollection
 }

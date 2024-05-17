@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"github.com/vukasinc25/fst-tiseu-project/handler"
 	"github.com/vukasinc25/fst-tiseu-project/middleware"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
@@ -38,7 +39,14 @@ func main() {
 	router.Use(GlobalMiddleware)
 	router.HandleFunc("/createUser", server.CreateUser).Methods("POST")
 
-	srv := &http.Server{Addr: "0.0.0.0:8011", Handler: router}
+	// Enable CORS
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"}, // Allow all origins
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
+	}).Handler(router)
+
+	srv := &http.Server{Addr: "0.0.0.0:8011", Handler: corsHandler}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {

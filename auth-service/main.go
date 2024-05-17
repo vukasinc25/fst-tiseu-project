@@ -4,16 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"log"
-
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	gorillaHandlers "github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 
 	"github.com/vukasinc25/fst-tiseu-project/handler"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
@@ -28,7 +26,7 @@ func main() {
 	// Initialize Gorilla Mux router and CORS middleware
 	router := mux.NewRouter()
 	router.StrictSlash(true)
-	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
+	//cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
 
 	// Initialize loggers with prefixes for different components
 	// logger := log.New(os.Stdout, "[auth-api] ", log.LstdFlags)
@@ -61,10 +59,19 @@ func main() {
 	log.Println("Ovde3: ", service)
 	router.HandleFunc("/users/auth", service.Auth).Methods("POST")
 	router.HandleFunc("/users/create", service.CreateUser).Methods("POST")
-	router.HandleFunc("/users/login", service.LoginUser).Methods("GET")
+	router.HandleFunc("/users/login", service.LoginUser).Methods("POST	")
+
+	// Enable CORS
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"}, // Allow all origins
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
+	}).Handler(router)
+
+	log.Println("Cors: ", corsHandler)
 
 	// Configure the HTTP server
-	server := &http.Server{Addr: ":8000", Handler: cors(router)}
+	server := &http.Server{Addr: ":8000", Handler: corsHandler}
 
 	// Print a message indicating the server is listening
 	log.Println("Server listening on port", port)
