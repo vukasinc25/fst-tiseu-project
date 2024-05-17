@@ -1,5 +1,7 @@
 package model
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Role string
 
 const (
@@ -9,11 +11,11 @@ const (
 )
 
 type User struct {
-	ID        string `bson:"id" json:"id"`
-	FirstName string `bson:"firstName" json:"firstName"`
-	LastName  string `bson:"lastName" json:"lastName"`
-	JMBG      int    `bson:"jmbg" json:"jmbg"`
-	UserName  string `bson:"userName" json:"userName"`
-	Password  string `bson:"password" json:"password"`
-	Role      Role   `bson:"role" json:"role"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Username  string             `bson:"username,omitempty" json:"username" validate:"required,min=6"`
+	Password  string             `bson:"password,omitempty" json:"password" validate:"required,password"`
+	Role      Role               `bson:"role,omitempty" json:"role"`
+	Email     string             `bson:"email,omitempty" json:"email" validate:"required,email"`
+	FirstName string             `bson:"firstname,omitempty" json:"firstname"`
+	LastName  string             `bson:"lastname,omitempty" json:"lastname"`
 }

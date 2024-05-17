@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/vukasinc25/fst-tiseu-project/handler"
-	"github.com/vukasinc25/fst-tiseu-project/middleware"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
 	"log"
 	"net/http"
@@ -22,7 +21,7 @@ func main() {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
-	logger := log.New(os.Stdout, "[profile-api] ", log.LstdFlags)
+	logger := log.New(os.Stdout, "[jobListing-api] ", log.LstdFlags)
 
 	newRepository, err := repository.New(context.Background(), logger)
 	if err != nil {
@@ -36,8 +35,9 @@ func main() {
 		return
 	}
 
-	router.Use(GlobalMiddleware)
-	router.HandleFunc("/createUser", server.CreateUser).Methods("POST")
+	router.HandleFunc("/createJobListing", server.CreateJobListing).Methods("POST")
+	router.HandleFunc("/applyForJob", server.CreateJobApplication).Methods("POST")
+	router.HandleFunc("/getJobListings", server.GetAllJobListings).Methods("GET")
 
 	// Enable CORS
 	corsHandler := cors.New(cors.Options{
@@ -46,7 +46,7 @@ func main() {
 		AllowedHeaders: []string{"Authorization", "Content-Type"},
 	}).Handler(router)
 
-	srv := &http.Server{Addr: "0.0.0.0:8011", Handler: corsHandler}
+	srv := &http.Server{Addr: "0.0.0.0:8012", Handler: corsHandler}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
@@ -68,10 +68,4 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("server stopped")
-}
-
-func GlobalMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		middleware.TokenMiddleware(next.ServeHTTP).ServeHTTP(w, r)
-	})
 }

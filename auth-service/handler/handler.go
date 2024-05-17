@@ -104,6 +104,7 @@ func (uh *UserHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func (uh *UserHandler) LoginUser(w http.ResponseWriter, req *http.Request) {
+	log.Println("ZAZA")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -134,6 +135,7 @@ func (uh *UserHandler) LoginUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Generate and send JWT token as a response
+	log.Println("RADI LOGIN XD", user)
 	jwtToken(user, w, uh)
 }
 

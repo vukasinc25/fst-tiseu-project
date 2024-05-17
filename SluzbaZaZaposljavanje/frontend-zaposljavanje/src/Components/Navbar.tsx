@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 export default function Navigationbar() {
     return ( 
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a id='navbar' className="navbar-brand" href="#">Navbar</a>
+        <a id='navbar' className="navbar-brand" href="#">Sluzba Za Zaposljavanje</a>
         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -19,7 +19,7 @@ export default function Navigationbar() {
             <li className="nav-item">
               <Link className="nav-link" to="/login">Login</Link>
             </li>
-            <li className="nav-item dropdown">
+            {/* <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Dropdown
               </a>
@@ -29,7 +29,7 @@ export default function Navigationbar() {
                 <div className="dropdown-divider"></div>
                 <a className="dropdown-item" href="#">Something else here</a>
               </div>
-            </li>
+            </li> */}
             {/* <li className="nav-item">
               <a className="nav-link disabled" href="#">Disabled</a>
             </li> */}

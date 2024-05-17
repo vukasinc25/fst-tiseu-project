@@ -56,12 +56,12 @@ services:
     networks:
       - network
 
-  joblisting-service:
-    image: joblisting-service
-    hostname: joblisting-service
+  job-service:
+    image: job-service
+    hostname: job-service
     build:
       context: .
-      dockerfile: SluzbaZaZaposljavanje/backend/jobListing-service/Dockerfile
+      dockerfile: SluzbaZaZaposljavanje/backend/job-service/Dockerfile
     restart: always
     environment:
       PORT: 8012

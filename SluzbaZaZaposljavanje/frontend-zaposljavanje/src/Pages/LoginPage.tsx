@@ -1,7 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import "./LoginPage.css"
 
 function LoginPage() {
+  const [username, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const response = await fetch("http://localhost:8000/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+        
+      });
+  
+      if (response.ok) {
+        // Handle successful login, e.g., redirect to dashboard
+        console.log("Login successful");
+        console.log(response)
+      } else {
+        // Handle login failur
+       
+        console.error("Login failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div>
       <section className="vh-100 gradient-custom">
@@ -12,23 +41,24 @@ function LoginPage() {
                 <div className="card-body p-5 text-center">
 
                   <div className="mb-md-5 mt-md-4 pb-5">
-
                     <h2 className="fw-bold mb-2 text-uppercase">Login</h2>
-                    <p className="text-white-50 mb-5">Please enter your login and password!</p>
+                    <p className="text-white-50 mb-5">Please enter your username and password!</p>
 
-                    <div data-mdb-input-init className="form-outline form-white mb-4">
-                      <input type="email" id="typeEmailX-2" className="form-control form-control-lg" />
-                      <label className="form-label" htmlFor="typeEmailX-2">Email</label>
-                    </div>
+                    <form onSubmit={handleSubmit}>
+                      <div className="form-outline form-white mb-4">
+                        <input type="text" id="typeEmailX-2" className="form-control form-control-lg" value={username} onChange={(e) => setEmail(e.target.value)} />
+                        <label className="form-label" htmlFor="typeEmailX-2">Username</label>
+                      </div>
 
-                    <div data-mdb-input-init className="form-outline form-white mb-4">
-                      <input type="password" id="typePasswordX-2" className="form-control form-control-lg" />
-                      <label className="form-label" htmlFor="typePasswordX-2">Password</label>
-                    </div>
+                      <div className="form-outline form-white mb-4">
+                        <input type="password" id="typePasswordX-2" className="form-control form-control-lg" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <label className="form-label" htmlFor="typePasswordX-2">Password</label>
+                      </div>
 
-                    <p className="small mb-5 pb-lg-2"><a className="text-white-50" href="#!">Forgot password?</a></p>
+                      <p className="small mb-5 pb-lg-2"><a className="text-white-50" href="#!">Forgot password?</a></p>
 
-                    <button data-mdb-button-init data-mdb-ripple-init className="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+                      <button className="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+                    </form>
 
                   </div>
 

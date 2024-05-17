@@ -19,4 +19,9 @@ type Competition struct {
 	ApplicationContact    string             `bson:"applicationContact" json:"applicationContact"`
 	TuitionFees           string             `bson:"tuitionFees" json:"tuitionFees"`
 	ContactInformation    string             `bson:"contactInformation" json:"contactInformation"`
+
+type RegisteredStudentsToCommpetition struct {
+	ID            primitive.ObjectID `bson:"_id" json:"_id"`
+	CompetitionID string             `bson:"competitionID" json:"competitionID"`
+	UserID        string             `bson:"userID" json:"userID"`
 }
