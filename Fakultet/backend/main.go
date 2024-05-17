@@ -13,6 +13,7 @@ import (
 	"github.com/vukasinc25/fst-tiseu-project/handler"
 	"github.com/vukasinc25/fst-tiseu-project/middleware"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
+	"github.com/vukasinc25/fst-tiseu-project/token"
 )
 
 func main() {
@@ -24,6 +25,11 @@ func main() {
 
 	timeoutContext, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	defer cancel()
+
+	tokenMaker, err := token.NewJWTMaker("12345678901234567890123456789012")
+	if err != nil {
+		log.Println("Ovde0: ", err)
+	}
 
 	newRepository, err := repository.New(timeoutContext)
 	if err != nil {
@@ -40,8 +46,13 @@ func main() {
 		return
 	}
 
-	// router.Use(GlobalMiddleware)
+	globalMiddleware := GlobalMiddleware(tokenMaker)
+	router.Use(globalMiddleware)
 	router.HandleFunc("/fakultet/create", server.CreateCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/user/create", server.CreateUser).Methods("POST")
+	router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/user/diploma", server.CreateDiploma).Methods("POST")
+	router.HandleFunc("/fakultet/user/diplomaByUserId", server.GetDiplomaByUserId).Methods("GET")
 
 	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: router}
 	go func() {
@@ -66,8 +77,8 @@ func main() {
 	log.Println("server stopped")
 }
 
-func GlobalMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		middleware.TokenMiddleware(next.ServeHTTP).ServeHTTP(w, r)
-	})
+func GlobalMiddleware(tokenMaker token.Maker) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return middleware.TokenMiddleware(tokenMaker)(next)
+	}
 }
