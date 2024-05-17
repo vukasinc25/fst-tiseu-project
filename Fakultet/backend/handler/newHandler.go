@@ -139,7 +139,7 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 	}
 
 	sendErrorWithMessage(w, "Competition Created", http.StatusCreated)
-
+}
 
 func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateRegistrationUserToCompetition")
