@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/handler"
 	"github.com/vukasinc25/fst-tiseu-project/middleware"
@@ -54,7 +55,8 @@ func main() {
 	router.HandleFunc("/fakultet/user/diploma", server.CreateDiploma).Methods("POST")
 	router.HandleFunc("/fakultet/user/diplomaByUserId", server.GetDiplomaByUserId).Methods("GET")
 
-	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: router}
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
+	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: cors(router)}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
