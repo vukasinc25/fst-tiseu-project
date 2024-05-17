@@ -190,9 +190,10 @@ func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Reques
 	log.Println("Payload: ", authPayload)
 
 	id := authPayload.ID.Hex()
+	id = strings.Trim(id, "\"")
 	log.Println("Id: ", id)
 
-	// id := "6646761f9e10566e77913d79"
+	//id := "664660b5049b6839aeec3955"
 
 	diploma, err := nh.repo.GetDiplomaByUserId(id)
 	if err != nil {

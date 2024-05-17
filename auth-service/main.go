@@ -59,7 +59,7 @@ func main() {
 	log.Println("Ovde3: ", service)
 	router.HandleFunc("/users/auth", service.Auth).Methods("POST")
 	router.HandleFunc("/users/create", service.CreateUser).Methods("POST")
-	router.HandleFunc("/users/login", service.LoginUser).Methods("POST	")
+	router.HandleFunc("/users/login", service.LoginUser).Methods("POST")
 
 	// Enable CORS
 	corsHandler := cors.New(cors.Options{

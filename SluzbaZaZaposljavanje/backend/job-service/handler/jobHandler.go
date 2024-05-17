@@ -80,8 +80,8 @@ func (jh *JobHandler) CreateJobApplication(w http.ResponseWriter, req *http.Requ
 
 	jobApplication, err := decodeApplicationBody(req.Body)
 
-	diploma, err := getDiplomaFromFakultetService()
-	log.Println(diploma)
+	//diploma, err := getDiplomaFromFakultetService()
+	//log.Println(diploma)
 
 	err = jh.repo.InsertJobApplication(jobApplication)
 	if err != nil {
@@ -96,14 +96,15 @@ func (jh *JobHandler) CreateJobApplication(w http.ResponseWriter, req *http.Requ
 }
 
 // COMMUNICATION WITH FAKULTET SERVICE
-func getDiplomaFromFakultetService() (*http.Response, error) {
-
-	url := "http://auth-service:8001/fakultet/m"
+func getDiplomaFromFakultetService(token string) (*http.Response, error) {
+	url := "http://auth-service:8001/fakultet/user/diplomaByUserId"
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
+	// Set Authorization header with bearer token
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
 	httpResp, err := http.DefaultClient.Do(req)
