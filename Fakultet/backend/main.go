@@ -9,9 +9,12 @@ import (
 	"syscall"
 	"time"
 
+	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/vukasinc25/fst-tiseu-projet/handler"
-	"github.com/vukasinc25/fst-tiseu-projet/repository"
+	"github.com/vukasinc25/fst-tiseu-project/handler"
+	"github.com/vukasinc25/fst-tiseu-project/middleware"
+	"github.com/vukasinc25/fst-tiseu-project/repository"
+	"github.com/vukasinc25/fst-tiseu-project/token"
 )
 
 func main() {
@@ -21,11 +24,22 @@ func main() {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
-	newRepository, err := repository.New(context.Background())
+	timeoutContext, cancel := context.WithTimeout(context.Background(), 50*time.Second)
+	defer cancel()
+
+	tokenMaker, err := token.NewJWTMaker("12345678901234567890123456789012")
+	if err != nil {
+		log.Println("Ovde0: ", err)
+	}
+
+	newRepository, err := repository.New(timeoutContext)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	defer newRepository.Disconnect(timeoutContext)
+
+	newRepository.Ping()
 
 	server, err := handler.NewHandler(newRepository)
 	if err != nil {
@@ -33,9 +47,16 @@ func main() {
 		return
 	}
 
-	router.HandleFunc("/", server.CreateUser).Methods("POST")
+	globalMiddleware := GlobalMiddleware(tokenMaker)
+	router.Use(globalMiddleware)
+	router.HandleFunc("/fakultet/create", server.CreateCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/user/create", server.CreateUser).Methods("POST")
+	router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/user/diploma", server.CreateDiploma).Methods("POST")
+	router.HandleFunc("/fakultet/user/diplomaByUserId", server.GetDiplomaByUserId).Methods("GET")
 
-	srv := &http.Server{Addr: "0.0.0.0:8000", Handler: router}
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
+	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: cors(router)}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
@@ -49,7 +70,6 @@ func main() {
 
 	log.Println("service shutting down ...")
 
-	// gracefully stop server
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -57,4 +77,10 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("server stopped")
+}
+
+func GlobalMiddleware(tokenMaker token.Maker) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return middleware.TokenMiddleware(tokenMaker)(next)
+	}
 }
