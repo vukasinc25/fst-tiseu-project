@@ -54,6 +54,8 @@ func main() {
 	router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
 	router.HandleFunc("/fakultet/user/diploma", server.CreateDiploma).Methods("POST")
 	router.HandleFunc("/fakultet/user/diplomaByUserId", server.GetDiplomaByUserId).Methods("GET")
+	router.HandleFunc("/fakultet/user/examResults", server.CreateUserExamResult).Methods("POST")
+	router.HandleFunc("/fakultet/user/getResultsByCompetitionId/{id}", server.GetAllExamResultsByCompetitionId).Methods("GET")
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
 	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: cors(router)}
