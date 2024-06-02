@@ -19,3 +19,5 @@ type User struct {
 	FirstName string             `bson:"firstname,omitempty" json:"firstname"`
 	LastName  string             `bson:"lastname,omitempty" json:"lastname"`
 }
+
+type Users []*User

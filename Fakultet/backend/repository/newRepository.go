@@ -38,6 +38,27 @@ func (uh *NewRepository) Disconnect(ctx context.Context) error {
 	return nil
 }
 
+func (nr *NewRepository) InsertDepartment(department *model.DepartmentDB) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	departmentCollection, err := nr.getCollection(6)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return err
+	}
+
+	result, err := departmentCollection.InsertOne(ctx, department)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	log.Printf("Document ID: %v\n", result.InsertedID)
+
+	return nil
+}
+
 func (uh *NewRepository) Ping() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -114,6 +135,52 @@ func (nr *NewRepository) CreateRegisteredStudentToTheCommpetition(registeredStud
 	log.Printf("Document ID: %v\n", result.InsertedID)
 
 	return nil
+}
+
+func (nr *NewRepository) GetAllDepartments() (*model.Departments, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	departmentCollection, err := nr.getCollection(6)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return nil, err
+	}
+
+	var departments model.Departments
+	cursor, err := departmentCollection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Println("Cant find departmentCollection: ", err)
+		return nil, err
+	}
+	if err = cursor.All(ctx, &departments); err != nil {
+		log.Println("Department Cursor.All: ", err)
+		return nil, err
+	}
+	return &departments, nil
+}
+
+func (nr *NewRepository) GetAllUsers() (*model.Users, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	userCollection, err := nr.getCollection(7)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return nil, err
+	}
+
+	var users model.Users
+	cursor, err := userCollection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Println("Cant find departmentCollection: ", err)
+		return nil, err
+	}
+	if err = cursor.All(ctx, &users); err != nil {
+		log.Println("Department Cursor.All: ", err)
+		return nil, err
+	}
+	return &users, nil
 }
 
 func (nr *NewRepository) InsertUserExamResult(results *model.ExamResult) error {
@@ -237,6 +304,10 @@ func (nr *NewRepository) getCollection(id int) (*mongo.Collection, error) {
 		competitionCollection = competitionDatabase.Collection("diplomas")
 	case 5:
 		competitionCollection = competitionDatabase.Collection("examResults")
+	case 6:
+		competitionCollection = competitionDatabase.Collection("departments")
+	case 7:
+		competitionCollection = competitionDatabase.Collection("users")
 	default:
 		return nil, fmt.Errorf("invalid collection id")
 	}

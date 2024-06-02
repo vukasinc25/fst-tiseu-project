@@ -28,6 +28,40 @@ func NewHandler(r *repository.NewRepository) (*newHandler, error) {
 	return &newHandler{r}, nil
 }
 
+func (nh *newHandler) GetAllDepartments(w http.ResponseWriter, req *http.Request) {
+
+	departments, err := nh.repo.GetAllDepartments()
+	if err != nil {
+		log.Println("Cant get departments: ", err)
+		sendErrorWithMessage(w, "Cant return departments", http.StatusInternalServerError)
+		return
+	}
+
+	users, err := nh.repo.GetAllUsers()
+	if err != nil {
+		log.Println("Cant get users: ", err)
+		sendErrorWithMessage(w, "Cant return users", http.StatusInternalServerError)
+		return
+	}
+
+	var departments1 []model.Department
+	for _, deptDB := range *departments {
+		dept := model.Department{
+			ID:    deptDB.ID,
+			Name:  deptDB.Name,
+			Staff: *users, // Add all users to the Staff field
+		}
+		departments1 = append(departments1, dept)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(departments1); err != nil {
+		log.Println("Error encoding departments to JSON:", err)
+		sendErrorWithMessage(w, "Error encoding response", http.StatusInternalServerError)
+	}
+
+}
+
 func (nh *newHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u Create")
 	ctx, cancel := context.WithCancel(context.Background())
@@ -289,6 +323,43 @@ func (nh *newHandler) GetAllExamResultsByCompetitionId(w http.ResponseWriter, re
 	}
 }
 
+func (nh *newHandler) CreateDepartment(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u CreateDepartment")
+
+	contentType := req.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		log.Println("Error cant mimi.ParseMediaType")
+		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if mediatype != "application/json" {
+		err := errors.New("expect application/json Content-Type")
+		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
+		return
+	}
+
+	log.Println("Pre decodeBody")
+	rt, err := decodeDepartmentBody(req.Body)
+	if err != nil {
+		log.Println("Decode: ", err)
+		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
+		return
+	}
+
+	rt.ID = primitive.NewObjectID()
+
+	err = nh.repo.InsertDepartment(rt)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Cant insert department", http.StatusInternalServerError)
+		return
+	}
+
+	sendErrorWithMessage(w, "Department inserted", http.StatusCreated)
+}
+
 func decodeCompetitionBody(r io.Reader) (*model.Competition, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
@@ -347,6 +418,20 @@ func decodeDipomaBody(r io.Reader) (*model.Diploma, error) {
 
 	return &rt, nil
 }
+
+func decodeDepartmentBody(r io.Reader) (*model.DepartmentDB, error) {
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+
+	var rt model.DepartmentDB
+	if err := dec.Decode(&rt); err != nil {
+		log.Println("Decode cant be done")
+		return nil, err
+	}
+
+	return &rt, nil
+}
+
 func decodeBody(r io.Reader) (*model.User, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
