@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
 	"github.com/vukasinc25/fst-tiseu-project/token"
@@ -131,7 +132,7 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 
 	log.Println("Competition: ", rt)
 
-	err = nh.repo.CreateCompetition(rt)
+	err = nh.repo.InsertCompetition(rt)
 	if err != nil {
 		log.Println(err)
 		sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
@@ -141,6 +142,7 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 	sendErrorWithMessage(w, "Competition Created", http.StatusCreated)
 }
 
+// Registrating logged user to the Fakulty Competition
 func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateRegistrationUserToCompetition")
 
@@ -152,8 +154,6 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 		return
 	}
 
-	// rt.ID = primitive.NewObjectID()
-
 	log.Println("Token: ", token)
 
 	req.Header.Set("Content-Type", "application/json")
@@ -161,8 +161,9 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 	// Set the Authorization header with the Bearer token
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	url := "http://"
-	req, err := http.NewRequest("GET", url, nil)
+	// send request to the high school service(high school service not created still)
+	url := "http://auth-service:8000/users/auth"
+	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		fmt.Println("Error creating request:", err)
 		return
@@ -182,7 +183,9 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 		return
 	}
 
-	log.Println("Body: ", body)
+	log.Println("Body: ", string(body))
+
+	// rt.ID = primitive.NewObjectID()
 
 	// err = nh.repo.CreateRegisteredStudentToTheCommpetition(rt)
 	// if err != nil {
@@ -193,7 +196,45 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 
 	sendErrorWithMessage(w, "User successfuly registerd to the competition", http.StatusCreated)
 }
-  
+
+func (nh *newHandler) CreateUserExamResult(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u CreateUserExamResult")
+
+	contentType := req.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		log.Println("Error cant mimi.ParseMediaType")
+		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if mediatype != "application/json" {
+		err := errors.New("expect application/json Content-Type")
+		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
+		return
+	}
+
+	log.Println("Pre decodeBody")
+	rt, err := decodeExamResultBody(req.Body)
+	if err != nil {
+		log.Println("Decode: ", err)
+		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
+		return
+	}
+
+	rt.ID = primitive.NewObjectID()
+	rt.ScoreEntryDate = time.Now()
+
+	err = nh.repo.InsertUserExamResult(rt)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Cant insert user exam result", http.StatusInternalServerError)
+		return
+	}
+
+	sendErrorWithMessage(w, "User exam result inserted", http.StatusCreated)
+}
+
 func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u GetDiplomaByUserId")
 
@@ -225,6 +266,29 @@ func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Reques
 	}
 }
 
+func (nh *newHandler) GetAllExamResultsByCompetitionId(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetAllExamResultsByCompetitionId")
+	vars := mux.Vars(req)
+
+	id := vars["id"]
+
+	id = strings.Trim(id, "\"")
+	log.Println("Id: ", id)
+
+	results, err := nh.repo.GetAllExamResultsByCompetitionId(id)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "User with that id has no diploma", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(results); err != nil {
+		log.Println("Error encoding diploma to JSON:", err)
+		sendErrorWithMessage(w, "Error encoding response", http.StatusInternalServerError)
+	}
+}
+
 func decodeCompetitionBody(r io.Reader) (*model.Competition, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
@@ -243,6 +307,19 @@ func decodeRegistrationOfUserToCompetitionBody(r io.Reader) (*model.RegisteredSt
 	dec.DisallowUnknownFields()
 
 	var rt model.RegisteredStudentsToCommpetition
+	if err := dec.Decode(&rt); err != nil {
+		log.Println("Decode cant be done")
+		return nil, err
+	}
+
+	return &rt, nil
+}
+
+func decodeExamResultBody(r io.Reader) (*model.ExamResult, error) {
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+
+	var rt model.ExamResult
 	if err := dec.Decode(&rt); err != nil {
 		log.Println("Decode cant be done")
 		return nil, err

@@ -74,7 +74,7 @@ func (nr *NewRepository) Insert(newUser *model.User, ctx context.Context) error 
 	return nil
 }
 
-func (nr *NewRepository) CreateCompetition(competition *model.Competition) error {
+func (nr *NewRepository) InsertCompetition(competition *model.Competition) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -114,6 +114,72 @@ func (nr *NewRepository) CreateRegisteredStudentToTheCommpetition(registeredStud
 	log.Printf("Document ID: %v\n", result.InsertedID)
 
 	return nil
+}
+
+func (nr *NewRepository) InsertUserExamResult(results *model.ExamResult) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	competitionCollection, err := nr.getCollection(5)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return err
+	}
+
+	result, err := competitionCollection.InsertOne(ctx, results)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	log.Printf("Document ID: %v\n", result.InsertedID)
+
+	return nil
+}
+
+func (nr *NewRepository) GetAllExamResultsByCompetitionId(competitionId string) (*model.ExamResults, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	competitionId = "6658d76eed49f71587b7c4b1" // Note: This line is for testing purposes and can be removed
+
+	resultatCollection, err := nr.getCollection(5)
+	if err != nil {
+		log.Println("Error getting collection: ", err)
+		return nil, err
+	}
+
+	var examResults model.ExamResults
+
+	cursor, err := resultatCollection.Find(ctx, bson.M{"competitionId": competitionId})
+	if err != nil {
+		log.Println("Error finding exam results: ", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	log.Println("Pre petlje")
+
+	for cursor.Next(ctx) {
+		log.Println("Petlja")
+		var result model.ExamResult
+		if err := cursor.Decode(&result); err != nil {
+			log.Println("Error decoding exam result:", err)
+			return nil, err
+		}
+		log.Println("Decoded result:", result)
+		examResults = append(examResults, &result)
+	}
+
+	log.Println("Posle petlje")
+	if err := cursor.Err(); err != nil {
+		log.Println("Cursor error:", err)
+		return nil, err
+	}
+
+	log.Println("Results: ", examResults)
+
+	return &examResults, nil
 }
 
 func (nr *NewRepository) InsertDiploma(diploma *model.Diploma) error {
@@ -162,18 +228,18 @@ func (nr *NewRepository) getCollection(id int) (*mongo.Collection, error) {
 	var competitionCollection *mongo.Collection
 	switch id {
 	case 1:
-		competitionCollection = competitionDatabase.Collection("competition")
+		competitionCollection = competitionDatabase.Collection("competitions")
 	case 2:
 		competitionCollection = competitionDatabase.Collection("registeredStudentsToCommpetition")
 	case 3:
 		competitionCollection = competitionDatabase.Collection("fakultetUsers")
 	case 4:
 		competitionCollection = competitionDatabase.Collection("diplomas")
+	case 5:
+		competitionCollection = competitionDatabase.Collection("examResults")
 	default:
 		return nil, fmt.Errorf("invalid collection id")
 	}
-
-	return competitionCollection, nil
 
 	return competitionCollection, nil
 }
