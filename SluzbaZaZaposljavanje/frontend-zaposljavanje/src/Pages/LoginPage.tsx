@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import "./LoginPage.css"
+import { useNavigate } from 'react-router';
 
 function LoginPage() {
   const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  let navigate = useNavigate()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,12 +20,10 @@ function LoginPage() {
       });
   
       if (response.ok) {
-        // Handle successful login, e.g., redirect to dashboard
-        console.log("Login successful");
         console.log(response)
+        console.log("Login successful");
+        return navigate("/")
       } else {
-        // Handle login failur
-       
         console.error("Login failed");
       }
     } catch (error) {

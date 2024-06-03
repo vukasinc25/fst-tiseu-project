@@ -27,7 +27,7 @@ function JobsPage() {
             console.error('Error:', error);
         }
     };
-
+  
     return (
         <>
             <div className="row">
