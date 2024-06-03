@@ -28,6 +28,86 @@ func NewHandler(r *repository.NewRepository) (*newHandler, error) {
 	return &newHandler{r}, nil
 }
 
+func (nh *newHandler) CreateStudyProgram(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u CreateStudyProgram")
+
+	contentType := req.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		log.Println("Error cant mimi.ParseMediaType")
+		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if mediatype != "application/json" {
+		err := errors.New("expect application/json Content-Type")
+		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
+		return
+	}
+
+	log.Println("Pre decodeBody")
+	rt, err := decodeStudyProgramBody(req.Body)
+	if err != nil {
+		log.Println("Decode: ", err)
+		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
+		return
+	}
+
+	rt.ID = primitive.NewObjectID()
+
+	err = nh.repo.InsertStudyProgram(rt)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Cant create study program", http.StatusInternalServerError)
+		return
+	}
+
+	sendErrorWithMessage(w, "Study progrma successfuly created", http.StatusCreated)
+}
+
+func (nh *newHandler) GetAlltudyPrograms(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetAllStudyPrograms")
+
+	results, err := nh.repo.GetAllStudyPrograms()
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Cant return study programs", http.StatusInternalServerError)
+		return
+	}
+
+	encodeToJson(w, results)
+}
+
+func (nh *newHandler) GetAllDepartments(w http.ResponseWriter, req *http.Request) {
+
+	departments, err := nh.repo.GetAllDepartments()
+	if err != nil {
+		log.Println("Cant get departments: ", err)
+		sendErrorWithMessage(w, "Cant return departments", http.StatusInternalServerError)
+		return
+	}
+
+	users, err := nh.repo.GetAllUsers()
+	if err != nil {
+		log.Println("Cant get users: ", err)
+		sendErrorWithMessage(w, "Cant return users", http.StatusInternalServerError)
+		return
+	}
+
+	var departments1 []model.Department
+	for _, deptDB := range *departments {
+		dept := model.Department{
+			ID:    deptDB.ID,
+			Name:  deptDB.Name,
+			Staff: *users, // Add all users to the Staff field
+		}
+		departments1 = append(departments1, dept)
+	}
+
+	encodeToJson(w, departments1)
+
+}
+
 func (nh *newHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u Create")
 	ctx, cancel := context.WithCancel(context.Background())
@@ -259,11 +339,7 @@ func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(diploma); err != nil {
-		log.Println("Error encoding diploma to JSON:", err)
-		sendErrorWithMessage(w, "Error encoding response", http.StatusInternalServerError)
-	}
+	encodeToJson(w, diploma)
 }
 
 func (nh *newHandler) GetAllExamResultsByCompetitionId(w http.ResponseWriter, req *http.Request) {
@@ -282,11 +358,44 @@ func (nh *newHandler) GetAllExamResultsByCompetitionId(w http.ResponseWriter, re
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(results); err != nil {
-		log.Println("Error encoding diploma to JSON:", err)
-		sendErrorWithMessage(w, "Error encoding response", http.StatusInternalServerError)
+	encodeToJson(w, results)
+}
+
+func (nh *newHandler) CreateDepartment(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u CreateDepartment")
+
+	contentType := req.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		log.Println("Error cant mimi.ParseMediaType")
+		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+		return
 	}
+
+	if mediatype != "application/json" {
+		err := errors.New("expect application/json Content-Type")
+		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
+		return
+	}
+
+	log.Println("Pre decodeBody")
+	rt, err := decodeDepartmentBody(req.Body)
+	if err != nil {
+		log.Println("Decode: ", err)
+		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
+		return
+	}
+
+	rt.ID = primitive.NewObjectID()
+
+	err = nh.repo.InsertDepartment(rt)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Cant insert department", http.StatusInternalServerError)
+		return
+	}
+
+	sendErrorWithMessage(w, "Department inserted", http.StatusCreated)
 }
 
 func decodeCompetitionBody(r io.Reader) (*model.Competition, error) {
@@ -328,13 +437,6 @@ func decodeExamResultBody(r io.Reader) (*model.ExamResult, error) {
 	return &rt, nil
 }
 
-func sendErrorWithMessage(w http.ResponseWriter, message string, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	errorResponse := map[string]string{"message": message}
-	json.NewEncoder(w).Encode(errorResponse)
-}
-
 func decodeDipomaBody(r io.Reader) (*model.Diploma, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
@@ -347,6 +449,33 @@ func decodeDipomaBody(r io.Reader) (*model.Diploma, error) {
 
 	return &rt, nil
 }
+
+func decodeStudyProgramBody(r io.Reader) (*model.StudyProgram, error) {
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+
+	var rt model.StudyProgram
+	if err := dec.Decode(&rt); err != nil {
+		log.Println("Decode cant be done")
+		return nil, err
+	}
+
+	return &rt, nil
+}
+
+func decodeDepartmentBody(r io.Reader) (*model.DepartmentDB, error) {
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+
+	var rt model.DepartmentDB
+	if err := dec.Decode(&rt); err != nil {
+		log.Println("Decode cant be done")
+		return nil, err
+	}
+
+	return &rt, nil
+}
+
 func decodeBody(r io.Reader) (*model.User, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
@@ -358,4 +487,19 @@ func decodeBody(r io.Reader) (*model.User, error) {
 	}
 
 	return &rt, nil
+}
+
+func sendErrorWithMessage(w http.ResponseWriter, message string, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	errorResponse := map[string]string{"message": message}
+	json.NewEncoder(w).Encode(errorResponse)
+}
+
+func encodeToJson(w http.ResponseWriter, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		log.Println("Error encoding departments to JSON:", err)
+		sendErrorWithMessage(w, "Error encoding response", http.StatusInternalServerError)
+	}
 }
