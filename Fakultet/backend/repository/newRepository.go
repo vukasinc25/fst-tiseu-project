@@ -95,6 +95,26 @@ func (nr *NewRepository) Insert(newUser *model.User, ctx context.Context) error 
 	return nil
 }
 
+func (nr *NewRepository) InsertStudyProgram(studyProgram *model.StudyProgram) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	studyProgramCollection, err := nr.getCollection(8)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return err
+	}
+
+	result, err := studyProgramCollection.InsertOne(ctx, studyProgram)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Printf("Document ID: %v\n", result.InsertedID)
+
+	return nil
+}
+
 func (nr *NewRepository) InsertCompetition(competition *model.Competition) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -114,6 +134,29 @@ func (nr *NewRepository) InsertCompetition(competition *model.Competition) error
 	log.Printf("Document ID: %v\n", result.InsertedID)
 
 	return nil
+}
+
+func (nr *NewRepository) GetAllStudyPrograms() (*model.StudyPrograms, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	studyProgramCollection, err := nr.getCollection(8)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return nil, err
+	}
+
+	var studyPrograms model.StudyPrograms
+	cursor, err := studyProgramCollection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Println("Cant find departmentCollection: ", err)
+		return nil, err
+	}
+	if err = cursor.All(ctx, &studyPrograms); err != nil {
+		log.Println("Department Cursor.All: ", err)
+		return nil, err
+	}
+	return &studyPrograms, nil
 }
 
 func (nr *NewRepository) CreateRegisteredStudentToTheCommpetition(registeredStudentsToCommpetition *model.RegisteredStudentsToCommpetition) error {
@@ -308,6 +351,8 @@ func (nr *NewRepository) getCollection(id int) (*mongo.Collection, error) {
 		competitionCollection = competitionDatabase.Collection("departments")
 	case 7:
 		competitionCollection = competitionDatabase.Collection("users")
+	case 8:
+		competitionCollection = competitionDatabase.Collection("studyPrograms")
 	default:
 		return nil, fmt.Errorf("invalid collection id")
 	}
