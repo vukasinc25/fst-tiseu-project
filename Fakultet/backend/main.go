@@ -61,7 +61,9 @@ func main() {
 	router.HandleFunc("/fakultet/studyProgram", server.CreateStudyProgram).Methods("POST")
 	router.HandleFunc("/fakultet/studyPrograms", server.GetAlltudyPrograms).Methods("GET")
 
-	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
+		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
+		gorillaHandlers.AllowedHeaders([]string{"Content-Type", "Authorization"}))
 	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: cors(router)}
 	go func() {
 		log.Println("server starting")
