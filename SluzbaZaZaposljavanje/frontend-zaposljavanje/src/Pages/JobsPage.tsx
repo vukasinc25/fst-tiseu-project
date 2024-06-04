@@ -23,7 +23,6 @@ function JobsPage() {
             if (response.ok) {
                 const jobsData: Job[] = await response.json();
                 setJobs(jobsData);
-                console.log(jobsData)
             } else {
                 throw new Error('Failed to fetch jobs');
             }

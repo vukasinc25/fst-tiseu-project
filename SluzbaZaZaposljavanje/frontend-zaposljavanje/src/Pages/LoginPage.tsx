@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 function LoginPage() {
   const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [jwtToken, setToken] = useState("");
   let navigate = useNavigate()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -20,7 +21,9 @@ function LoginPage() {
       });
   
       if (response.ok) {
-        console.log(response)
+        const data = await response.json();
+        setToken(data)
+        localStorage.setItem("jwtToken", data.access_token)
         console.log("Login successful");
         return navigate("/")
       } else {
@@ -36,7 +39,7 @@ function LoginPage() {
       <section className="vh-100 gradient-custom">
         <div className="container py-5 h-100">
           <div className="row d-flex justify-content-center align-items-center h-100">
-            <div className="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div className="col-12 col-md-8 col-lg-6 col-xl-8">
               <div className="card bg-dark text-white" style={{ borderRadius: "1rem" }}>
                 <div className="card-body p-5 text-center">
 

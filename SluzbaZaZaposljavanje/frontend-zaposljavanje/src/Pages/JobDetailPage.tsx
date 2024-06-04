@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import './JobDetailPage.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Job {
     _id: string;
@@ -16,6 +18,10 @@ const JobDetailPage = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
+    const jwtToken = localStorage.getItem("jwtToken")
+    const employeeId = jwtToken;
+    const jobListingId = jobId;
 
     const fetchData = async () => {
         try {
@@ -39,10 +45,13 @@ const JobDetailPage = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ jobId }),
+                body: JSON.stringify({ jobListingId, employeeId }),
             });
+            // console.log("jobId:" + jobId) 
+            // console.log("jwtToken:" + jwtToken)
             if (response.ok) {
-                alert('Job application submitted successfully!');
+                console.log("toast where")
+                toast.success('Job application submitted successfully!', {position: "top-right"});
             } else {
                 throw new Error('Failed to submit job application');
             }
