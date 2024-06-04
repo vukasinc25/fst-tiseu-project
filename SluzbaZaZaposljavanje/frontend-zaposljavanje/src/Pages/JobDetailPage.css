@@ -1,0 +1,31 @@
+.container {
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+.heading {
+    text-align: center;
+    color: #333;
+}
+
+.job-details {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.job-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.job-description,
+.requirements {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #34495e;
+}

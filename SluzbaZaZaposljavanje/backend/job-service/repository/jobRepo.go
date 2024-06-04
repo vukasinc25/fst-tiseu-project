@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -107,6 +108,30 @@ func (jr *JobRepository) GetAllJobListings() (model.JobListings, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (jr *JobRepository) GetJobListing(id string) (model.JobListing, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	jobListingCollection := jr.getJobListingCollection()
+
+	log.Println("Fetching job listing with ID:", id)
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		jr.logger.Println("Invalid ID format:", err)
+		return model.JobListing{}, err
+	}
+
+	var job model.JobListing
+	err = jobListingCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&job)
+	if err != nil {
+		jr.logger.Println("Error fetching job listing:", err)
+		return model.JobListing{}, err
+	}
+
+	return job, nil
 }
 
 func (jr *JobRepository) getJobListingCollection() *mongo.Collection {

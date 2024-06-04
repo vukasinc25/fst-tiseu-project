@@ -8,10 +8,10 @@ import (
 )
 
 type JobApplication struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	EmployerId string             `bson:"employerId, omitempty" json:"employerId"`
-	EmployeeId string             `bson:"employeeId,omitempty" json:"employeeId"`
-	Diploma    string             `bson:"diploma,omitempty" json:"diploma"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	JobListingId string             `bson:"jobListingId, omitempty" json:"jobListingId"`
+	EmployeeId   string             `bson:"employeeId,omitempty" json:"employeeId"`
+	Diploma      string             `bson:"diploma,omitempty" json:"diploma"`
 }
 
 type JobApplications []*JobApplication
@@ -36,7 +36,7 @@ func (a *JobApplication) FromJSON(r io.Reader) error {
 }
 
 func ValidateJobApplication(notification *JobApplication) error {
-	if notification.EmployerId == "" {
+	if notification.JobListingId == "" {
 		return errors.New("job title is required")
 	}
 	if notification.EmployeeId == "" {

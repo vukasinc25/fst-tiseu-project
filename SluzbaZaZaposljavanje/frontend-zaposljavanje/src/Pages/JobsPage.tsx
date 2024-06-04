@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 interface Job {
+    _id: string;
     jobTitle: string;
     jobDescription: string;
     requirements: string;
@@ -12,6 +14,8 @@ function JobsPage() {
     useEffect(() => {
         fetchData();
     }, []);
+
+    let navigate = useNavigate();
 
     const fetchData = async () => {
         try {
@@ -32,12 +36,12 @@ function JobsPage() {
         <>
             <div className="row">
                 {jobs.map((job: Job, index: number) => (
-                    <div key={index} className="col-sm-4"> {/* Changed col-sm-6 to col-sm-4 */}
+                    <div key={index} className="col-sm-4">
                         <div className="card">
                             <div className="card-body">
                                 <h5 className="card-title">{job.jobTitle}</h5>
                                 <h2 className="card-text">{job.jobDescription}</h2>
-                                <button className="btn btn-primary">More</button>
+                                <button className="btn btn-primary" onClick={() => navigate("/job_info/" + job._id)}>More Information</button>
                             </div>
                         </div>
                     </div>

@@ -9,6 +9,7 @@ import (
 
 type JobListing struct {
 	ID             primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	EmployerId     string             `bson:"employerId, omitempty" json:"employerId"`
 	JobTitle       string             `bson:"jobTitle, omitempty" json:"jobTitle"`
 	JobDescription string             `bson:"JobDescription,omitempty" json:"JobDescription"`
 	Requirements   string             `bson:"requirements,omitempty" json:"requirements"`

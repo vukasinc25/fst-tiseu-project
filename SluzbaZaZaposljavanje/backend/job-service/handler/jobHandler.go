@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
 	"io"
@@ -28,6 +29,28 @@ func (jh *JobHandler) GetAllJobListings(w http.ResponseWriter, req *http.Request
 	}
 
 	err = jobListings.ToJSON(w)
+	if err != nil {
+		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (jh *JobHandler) GetJobListing(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	id := vars["id"]
+
+	log.Println(id)
+
+	jobListing, err := jh.repo.GetJobListing(id)
+	if err != nil {
+		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
+	}
+
+	if &jobListing == nil {
+		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+	}
+
+	err = jobListing.ToJSON(w)
 	if err != nil {
 		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
 		return
