@@ -222,6 +222,19 @@ func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request
 	sendErrorWithMessage(w, "Competition Created", http.StatusCreated)
 }
 
+func (nh *newHandler) GetAllCompetitions(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetAllCompetitions")
+
+	results, err := nh.repo.GetAllCompetitions()
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Cant return competitions", http.StatusInternalServerError)
+		return
+	}
+
+	encodeToJson(w, results)
+}
+
 // Registrating logged user to the Fakulty Competition
 func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateRegistrationUserToCompetition")

@@ -75,6 +75,29 @@ func (uh *NewRepository) Ping() {
 	fmt.Println(databases)
 }
 
+func (nr *NewRepository) GetAllCompetitions() (*model.Competitions, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	competitionCollection, err := nr.getCollection(1)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return nil, err
+	}
+
+	var competitons model.Competitions
+	cursor, err := competitionCollection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Println("Cant find departmentCollection: ", err)
+		return nil, err
+	}
+	if err = cursor.All(ctx, &competitons); err != nil {
+		log.Println("Department Cursor.All: ", err)
+		return nil, err
+	}
+	return &competitons, nil
+}
+
 func (nr *NewRepository) Insert(newUser *model.User, ctx context.Context) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

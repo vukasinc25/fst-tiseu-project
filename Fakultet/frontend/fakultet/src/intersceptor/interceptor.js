@@ -1,18 +1,19 @@
 // src/interceptor.js
-const customFetch = async (url, options) => {
-
+const customFetch = async (url, options = {}) => {
     const token = localStorage.getItem('accessToken');
-    console.log("Token: ", token)
+    console.log("Token: ", token);
+
     // Add common headers or other configurations here
     const modifiedOptions = {
         ...options,
         headers: {
             ...options.headers,
             'Authorization': `Bearer ${token}`, // Use the token from local storage
+            'Content-Type': 'application/json', // Add default Content-Type header
         },
     };
 
-    console.log("Interseptored request: ", modifiedOptions)
+    console.log("Intercepted request: ", modifiedOptions);
 
     try {
         const response = await fetch(url, modifiedOptions);

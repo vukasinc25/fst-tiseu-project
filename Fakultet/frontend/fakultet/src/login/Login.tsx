@@ -1,11 +1,12 @@
+import { useHistory } from 'react-router-dom';
 import './Login.css';
 import { useState } from "react";
-import customFetch from './intersceptor/interceptor';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    const history = useHistory();
+    
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         console.log(`Username: ${username}, Password: ${password}`);
@@ -34,15 +35,8 @@ const Login = () => {
                 console.log('Access Token:', localStorage.getItem("accessToken"));
             }
 
-            // Fetching study programs using customFetch
-            const response2 = await customFetch('http://localhost:8001/fakultet/studyPrograms', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            history.push("/competitions");
 
-            console.log('Response:', response2);
 
         } catch (error) {
             console.error('Error:', error);
@@ -50,7 +44,7 @@ const Login = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className='form1' onSubmit={handleSubmit}>
             <label>
                 Username:
             </label>

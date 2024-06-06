@@ -49,7 +49,8 @@ func main() {
 
 	globalMiddleware := GlobalMiddleware(tokenMaker)
 	router.Use(globalMiddleware)
-	router.HandleFunc("/fakultet/create", server.CreateCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/createCompetition", server.CreateCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/competitions", server.GetAllCompetitions).Methods("GET")
 	router.HandleFunc("/fakultet/user/create", server.CreateUser).Methods("POST")
 	router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
 	router.HandleFunc("/fakultet/user/diploma", server.CreateDiploma).Methods("POST")
