@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import Navigationbar from "../Components/Navbar";
-import LoginPage from "../Pages/LoginPage";
-import HomePage from "../Pages/HomePage";
-import JobsPage from "../Pages/JobsPage";
-import JobDetailPage from "../Pages/JobDetailPage";
+import LoginPage from "../Pages/Login/LoginPage";
+import HomePage from "../Pages/Home/HomePage";
+import JobsPage from "../Pages/Jobs/JobsPage";
+import JobDetailPage from "../Pages/JobDetails/JobDetailPage";
+import EmployerPage from "../Pages/EmployerPage/EmployerPage";
 
 export const router = createBrowserRouter ([
     {
@@ -14,7 +14,8 @@ export const router = createBrowserRouter ([
             {path: "", element: <HomePage/>},
             {path: "login", element: <LoginPage/>},
             {path: "job_list", element: <JobsPage/>},
-            {path: "job_info/:jobId", element: <JobDetailPage/>}
+            {path: "job_info/:jobId", element: <JobDetailPage/>},
+            {path: "employer_page", element: <EmployerPage/>}
         ],
     }
 ])

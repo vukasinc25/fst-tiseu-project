@@ -97,17 +97,17 @@ func (jr *JobRepository) GetAllJobListings() (model.JobListings, error) {
 
 	jobListingCollection := jr.getJobListingCollection()
 
-	var users model.JobListings
+	var jobListings model.JobListings
 	jobListingCursor, err := jobListingCollection.Find(ctx, bson.M{})
 	if err != nil {
 		jr.logger.Println(err)
 		return nil, err
 	}
-	if err = jobListingCursor.All(ctx, &users); err != nil {
+	if err = jobListingCursor.All(ctx, &jobListings); err != nil {
 		jr.logger.Println(err)
 		return nil, err
 	}
-	return users, nil
+	return jobListings, nil
 }
 
 func (jr *JobRepository) GetJobListing(id string) (model.JobListing, error) {
@@ -130,8 +130,33 @@ func (jr *JobRepository) GetJobListing(id string) (model.JobListing, error) {
 		jr.logger.Println("Error fetching job listing:", err)
 		return model.JobListing{}, err
 	}
-
 	return job, nil
+}
+
+func (jr *JobRepository) GetAllJobApplicationsByEmployerId(id string) (model.JobApplications, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	jobApplicationCollection := jr.getJobApplicationCollection()
+
+	//objID, err := primitive.ObjectIDFromHex(id)
+	//if err != nil {
+	//	jr.logger.Println("Invalid ID format:", err)
+	//	return model.JobApplications{}, err
+	//}
+
+	var jobApplications model.JobApplications
+	jobListingCursor, err := jobApplicationCollection.Find(ctx, bson.M{"employerId": id})
+	if err != nil {
+		jr.logger.Println(err)
+		return nil, err
+	}
+	if err = jobListingCursor.All(ctx, &jobApplications); err != nil {
+		jr.logger.Println(err)
+		return nil, err
+	}
+
+	return jobApplications, nil
 }
 
 func (jr *JobRepository) getJobListingCollection() *mongo.Collection {

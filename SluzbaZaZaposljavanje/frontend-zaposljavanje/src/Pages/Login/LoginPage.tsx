@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import "./LoginPage.css"
 import { useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
+import { decodeToken } from '../../utils/jwt';
+
+interface UserInfo {
+  username: string;
+  issued_at: string;
+  role: string;
+  expired_at: string
+}
 
 function LoginPage() {
   const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [jwtToken, setToken] = useState("");
+  // const [jwtToken, setToken] = useState("");
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   let navigate = useNavigate()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -22,15 +32,26 @@ function LoginPage() {
   
       if (response.ok) {
         const data = await response.json();
-        setToken(data)
+        // setToken(data)
+        console.log(data.access_token)
+        console.log("ALO")
+
+        const decodedToken = decodeToken(data.access_token)
+        if (decodedToken) {
+          localStorage.setItem("role", decodedToken.role)
+          localStorage.setItem("username", decodedToken.username)
+        }
+
         localStorage.setItem("jwtToken", data.access_token)
-        console.log("Login successful");
+
+        toast.success("Login successful", {position: "top-right"});
         return navigate("/")
       } else {
-        console.error("Login failed");
+        toast.error("Login failed");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.log("Error" + error)
+      toast.error("Error, try again later");
     }
   };
 

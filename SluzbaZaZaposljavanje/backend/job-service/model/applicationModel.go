@@ -10,6 +10,7 @@ import (
 type JobApplication struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	JobListingId string             `bson:"jobListingId, omitempty" json:"jobListingId"`
+	EmployerId   string             `bson:"employerId,omitempty" json:"employerId"`
 	EmployeeId   string             `bson:"employeeId,omitempty" json:"employeeId"`
 	Diploma      string             `bson:"diploma,omitempty" json:"diploma"`
 }

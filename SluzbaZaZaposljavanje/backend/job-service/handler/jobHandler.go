@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
+	"github.com/vukasinc25/fst-tiseu-project/token"
 	"io"
 	"log"
 	"mime"
@@ -82,6 +83,36 @@ func (jh *JobHandler) CreateJobListing(w http.ResponseWriter, req *http.Request)
 			return
 		}
 		sendErrorWithMessage(w, "Error while inserting job listing", http.StatusBadRequest)
+		return
+	}
+}
+
+func (jh *JobHandler) GetAllJobApplicationsByEmployerId(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	authPayload, ok := ctx.Value("authorization_payload").(*token.Payload)
+	if !ok || authPayload == nil {
+		sendErrorWithMessage(w, "Authorization payload not found", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Payload: ", authPayload)
+
+	id := authPayload.ID.Hex()
+	id = strings.Trim(id, "\"")
+	log.Println("Id: ", id)
+
+	jobListing, err := jh.repo.GetAllJobApplicationsByEmployerId(id)
+	if err != nil {
+		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
+	}
+
+	if &jobListing == nil {
+		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
+	}
+
+	err = jobListing.ToJSON(w)
+	if err != nil {
+		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
 		return
 	}
 }

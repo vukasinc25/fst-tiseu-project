@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import './JobDetailPage.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 interface Job {
     _id: string;
+    employerId: string;
     jobTitle: string;
     jobDescription: string;
     requirements: string;
@@ -14,11 +14,12 @@ interface Job {
 const JobDetailPage = () => {
     const { jobId } = useParams();
     const [job, setJob] = useState<Job | null>(null);
+    const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
         fetchData();
     }, []);
-
+    
     const jwtToken = localStorage.getItem("jwtToken")
     const employeeId = jwtToken;
     const jobListingId = jobId;
@@ -29,7 +30,6 @@ const JobDetailPage = () => {
             if (response.ok) {
                 const jobsData: Job = await response.json();
                 setJob(jobsData);
-                console.log(jobsData)
             } else {
                 throw new Error('Failed to fetch job info');
             }
@@ -53,6 +53,7 @@ const JobDetailPage = () => {
                 console.log("toast where")
                 toast.success('Job application submitted successfully!', {position: "top-right"});
             } else {
+                toast.error("Failed to aplpy for the job", {position: "top-right"})
                 throw new Error('Failed to submit job application');
             }
         } catch (error) {
@@ -60,6 +61,11 @@ const JobDetailPage = () => {
             alert('Failed to submit job application');
         }
     };
+
+    const handleButtonClick = () => {
+        createJobApplication();
+        setIsVisible(false);
+    }
 
     return (
         <div className="container">
@@ -69,7 +75,9 @@ const JobDetailPage = () => {
                     <i className="job-title"><strong>Job Name:</strong> {job.jobTitle}</i>
                     <p className="job-description"><strong>Description:</strong> {job.jobDescription}</p>
                     <p className="requirements"><strong>Requirements:</strong> {job.requirements}</p>
-                    <button className="btn btn-primary" onClick={() => createJobApplication()}>Apply</button>
+                    {isVisible && (
+                        <button className="btn btn-primary" onClick={handleButtonClick}>Apply</button>
+                    )}
                 </div>
             ) : (
                 <p>Job Does Not Exist</p>

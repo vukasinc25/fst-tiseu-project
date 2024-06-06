@@ -38,7 +38,8 @@ func main() {
 	router.HandleFunc("/createJobListing", server.CreateJobListing).Methods("POST")
 	router.HandleFunc("/applyForJob", server.CreateJobApplication).Methods("POST")
 	router.HandleFunc("/getJobListings", server.GetAllJobListings).Methods("GET")
-	router.HandleFunc("/getJobInfo/{id}", server.GetJobListing)
+	router.HandleFunc("/getJobInfo/{id}", server.GetJobListing).Methods("GET")
+	router.HandleFunc("/employerPage", server.CreateJobApplication).Methods("POST")
 
 	// Enable CORS
 	corsHandler := cors.New(cors.Options{

@@ -1,16 +1,15 @@
 import * as React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Navbar } from "react-bootstrap";
-import { Link, useNavigate } from 'react-router-dom';
+// import { Navbar } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 
 export default function Navigationbar() {
-  let navigate = useNavigate();
-
   const logout = () => {
     localStorage.removeItem('jwtToken');
   };
 
   const isLoggedIn = localStorage.getItem("jwtToken")
+  const userRole = localStorage.getItem("role")
 
     return ( 
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -35,6 +34,12 @@ export default function Navigationbar() {
               <Link className="nav-link" to="/login">Login</Link>
               </li>)}
             </div>
+            <div>
+              {userRole == "ZAPOSLJAVANJE" && <li className='nav-item'>
+              <Link className='nav-link' to="/employer_page">EmployerPage</Link>"
+            </li>}
+            </div>
+            
             {/* <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Dropdown
