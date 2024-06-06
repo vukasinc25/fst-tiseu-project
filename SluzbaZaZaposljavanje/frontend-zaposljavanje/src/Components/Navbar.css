@@ -1,7 +1,32 @@
 #navbar {
- margin-left: 500px;    
+ margin-left: 20px;    
 }
+/* src/styles/Navigationbar.css */
 
-.navbar-brand {
-    margin-left: 500px;
-}
+/* Navbar Styling */
+.navbar {
+    margin-bottom: 0px; /* Add margin at the bottom */
+  }
+  
+  /* Navbar Brand Styling */
+  .navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+  
+  /* Navbar Link Styling */
+  .navbar-nav .nav-link {
+    padding: 0.5rem 1rem; /* Add padding to the links */
+  }
+  
+  /* Active Link Styling */
+  .nav-item.active .nav-link {
+    background-color: rgba(255, 255, 255, 0.1); /* Add a transparent background for active links */
+  }
+  
+  /* Hover Effect for Links */
+  .navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Add a transparent background on hover */
+    transition: background-color 0.3s ease; /* Smooth transition */
+  }
+  

@@ -3,8 +3,9 @@ import App from "../App";
 import LoginPage from "../Pages/Login/LoginPage";
 import HomePage from "../Pages/Home/HomePage";
 import JobsPage from "../Pages/Jobs/JobsPage";
-import JobDetailPage from "../Pages/JobDetails/JobDetailPage";
+import JobDetailPage from "../Pages/Jobs/JobDetailPage";
 import EmployerPage from "../Pages/EmployerPage/EmployerPage";
+import CreateJobListing from "../Pages/Jobs/CreateJobListing";
 
 export const router = createBrowserRouter ([
     {
@@ -13,9 +14,10 @@ export const router = createBrowserRouter ([
         children: [
             {path: "", element: <HomePage/>},
             {path: "login", element: <LoginPage/>},
-            {path: "job_list", element: <JobsPage/>},
-            {path: "job_info/:jobId", element: <JobDetailPage/>},
-            {path: "employer_page", element: <EmployerPage/>}
+            {path: "employer_page", element: <EmployerPage/>},
+            {path: "job/list", element: <JobsPage/>},
+            {path: "job/info/:jobId", element: <JobDetailPage/>},
+            {path: "job/create", element: <CreateJobListing/>}
         ],
     }
 ])

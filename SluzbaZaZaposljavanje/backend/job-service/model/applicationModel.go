@@ -17,13 +17,14 @@ type JobApplication struct {
 
 type JobApplications []*JobApplication
 
-//type ReqToken struct {
-//	Token string `json:"token"`
-//}
-
 func (as *JobApplications) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(as)
+}
+
+func (a *JobApplications) FromJSON(r io.Reader) error {
+	d := json.NewDecoder(r)
+	return d.Decode(a)
 }
 
 func (a *JobApplication) ToJSON(w io.Writer) error {

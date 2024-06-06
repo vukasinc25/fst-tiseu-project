@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
-	"github.com/vukasinc25/fst-tiseu-project/token"
 	"io"
 	"log"
 	"mime"
@@ -39,8 +38,6 @@ func (jh *JobHandler) GetAllJobListings(w http.ResponseWriter, req *http.Request
 func (jh *JobHandler) GetJobListing(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id := vars["id"]
-
-	log.Println(id)
 
 	jobListing, err := jh.repo.GetJobListing(id)
 	if err != nil {
@@ -88,18 +85,20 @@ func (jh *JobHandler) CreateJobListing(w http.ResponseWriter, req *http.Request)
 }
 
 func (jh *JobHandler) GetAllJobApplicationsByEmployerId(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
-
-	authPayload, ok := ctx.Value("authorization_payload").(*token.Payload)
-	if !ok || authPayload == nil {
-		sendErrorWithMessage(w, "Authorization payload not found", http.StatusInternalServerError)
-		return
-	}
-	log.Println("Payload: ", authPayload)
-
-	id := authPayload.ID.Hex()
-	id = strings.Trim(id, "\"")
-	log.Println("Id: ", id)
+	//ctx := req.Context()
+	//
+	//authPayload, ok := ctx.Value("authorization_payload").(*token.Payload)
+	//if !ok || authPayload == nil {
+	//	sendErrorWithMessage(w, "Authorization payload not found", http.StatusInternalServerError)
+	//	return
+	//}
+	//log.Println("Payload: ", authPayload)
+	//
+	//id := authPayload.ID.Hex()
+	//id = strings.Trim(id, "\"")
+	//log.Println("Id: ", id)
+	vars := mux.Vars(req)
+	id := vars["id"]
 
 	jobListing, err := jh.repo.GetAllJobApplicationsByEmployerId(id)
 	if err != nil {

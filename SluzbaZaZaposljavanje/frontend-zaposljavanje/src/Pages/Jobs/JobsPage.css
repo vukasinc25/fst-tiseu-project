@@ -1,0 +1,57 @@
+/* Ensure the jobs page container takes up the full height of the viewport */
+.jobs-page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* The row of job cards should flex-grow to fill the remaining space */
+.jobs-page-container .row {
+    flex-grow: 1;
+}
+
+/* Ensure the cards are neatly displayed */
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    height: 100%; /* Makes the card take up all the available height */
+}
+
+/* Ensure the card body has some padding */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.card-text {
+    font-size: 1rem;
+}
+
+.btn {
+    font-size: 1rem;
+}
+
+/* Container to take up full viewport height and flex layout for alignment */
+.container-fluid {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Footer styling */
+.footer {
+    background-color: #343a40;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}

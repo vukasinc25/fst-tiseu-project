@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { decodeToken } from '../../utils/jwt';
 
 interface UserInfo {
+  id: string;
   username: string;
   issued_at: string;
   role: string;
@@ -40,6 +41,7 @@ function LoginPage() {
         if (decodedToken) {
           localStorage.setItem("role", decodedToken.role)
           localStorage.setItem("username", decodedToken.username)
+          localStorage.setItem("userId", decodedToken.id)
         }
 
         localStorage.setItem("jwtToken", data.access_token)

@@ -35,11 +35,12 @@ func main() {
 		return
 	}
 
-	router.HandleFunc("/createJobListing", server.CreateJobListing).Methods("POST")
-	router.HandleFunc("/applyForJob", server.CreateJobApplication).Methods("POST")
-	router.HandleFunc("/getJobListings", server.GetAllJobListings).Methods("GET")
-	router.HandleFunc("/getJobInfo/{id}", server.GetJobListing).Methods("GET")
-	router.HandleFunc("/employerPage", server.CreateJobApplication).Methods("POST")
+	router.HandleFunc("/job/createJobListing", server.CreateJobListing).Methods("POST")
+	router.HandleFunc("/job/applyForJob", server.CreateJobApplication).Methods("POST")
+	router.HandleFunc("/job/getJobListings", server.GetAllJobListings).Methods("GET")
+	router.HandleFunc("/job/getJobInfo/{id}", server.GetJobListing).Methods("GET")
+	router.HandleFunc("/job/employerPage/{id}", server.GetAllJobApplicationsByEmployerId).Methods("GET")
+	router.HandleFunc("/job/employerPage/{id}", server.GetAllJobApplicationsByEmployerId).Methods("DELETE")
 
 	// Enable CORS
 	corsHandler := cors.New(cors.Options{

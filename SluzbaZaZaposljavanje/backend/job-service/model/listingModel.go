@@ -10,6 +10,8 @@ import (
 type JobListing struct {
 	ID             primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	EmployerId     string             `bson:"employerId, omitempty" json:"employerId"`
+	CompanyName    string             `bson:"companyName, omitempty" json:"companyName"`
+	CityName       string             `bson:"cityName, omitempty" json:"cityName"`
 	JobTitle       string             `bson:"jobTitle, omitempty" json:"jobTitle"`
 	JobDescription string             `bson:"jobDescription,omitempty" json:"jobDescription"`
 	Requirements   string             `bson:"requirements,omitempty" json:"requirements"`
@@ -24,6 +26,11 @@ type ReqToken struct {
 func (as *JobListings) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(as)
+}
+
+func (a *JobListings) FromJSON(r io.Reader) error {
+	d := json.NewDecoder(r)
+	return d.Decode(a)
 }
 
 func (a *JobListing) ToJSON(w io.Writer) error {
