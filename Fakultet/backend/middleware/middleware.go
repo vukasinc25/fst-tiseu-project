@@ -76,6 +76,7 @@ func TokenMiddleware(tokenMaker token.Maker) mux.MiddlewareFunc {
 
 			// Store the payload in the request context
 			ctx := context.WithValue(r.Context(), "authorization_payload", payload)
+			LogAuthorizationPayload(ctx)
 			ctx = context.WithValue(r.Context(), "accessToken", tokenS)
 			r = r.WithContext(ctx)
 
@@ -83,6 +84,18 @@ func TokenMiddleware(tokenMaker token.Maker) mux.MiddlewareFunc {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func LogAuthorizationPayload(ctx context.Context) {
+	// Extract the authorization payload from the context
+	authPayload, ok := ctx.Value("authorization_payload").(*token.Payload)
+	if !ok {
+		log.Println("authorization_payload not found in context")
+		return
+	}
+
+	// Log the authorization payload
+	log.Printf("authorization_payload: %s\n", authPayload)
 }
 
 func sendErrorWithMessage(w http.ResponseWriter, message string, statusCode int) {

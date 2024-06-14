@@ -16,7 +16,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
-	"github.com/vukasinc25/fst-tiseu-project/token"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -182,7 +181,7 @@ func (nh *newHandler) CreateDiploma(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	sendErrorWithMessage(w, "User Diploma", http.StatusCreated)
+	sendErrorWithMessage(w, "User diploma created", http.StatusCreated)
 }
 
 func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request) {
@@ -351,17 +350,26 @@ func (nh *newHandler) CreateUserExamResult(w http.ResponseWriter, req *http.Requ
 func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u GetDiplomaByUserId")
 
-	ctx := req.Context()
+	// ctx := req.Context()
+	// log.Println("Ctx: ", ctx)
 
-	authPayload, ok := ctx.Value("authorization_payload").(*token.Payload)
-	if !ok || authPayload == nil {
-		sendErrorWithMessage(w, "Authorization payload not found", http.StatusInternalServerError)
-		return
-	}
+	// authPayload, ok := ctx.Value("authorization_payload").(*token.Payload)
+	// if !ok || authPayload == nil {
+	// 	log.Println("AuthPayload: ", authPayload)
+	// 	sendErrorWithMessage(w, "Authorization payload not found", http.StatusInternalServerError)
+	// 	return
+	// }
 
-	log.Println("Payload: ", authPayload)
+	// log.Println("Payload: ", authPayload)
 
-	id := authPayload.ID.Hex()
+	// id := authPayload.ID.Hex()
+	// id = strings.Trim(id, "\"")
+	// log.Println("Id: ", id)
+
+	vars := mux.Vars(req)
+
+	id := vars["id"]
+
 	id = strings.Trim(id, "\"")
 	log.Println("Id: ", id)
 

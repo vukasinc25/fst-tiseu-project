@@ -7,6 +7,8 @@ import Competitions from './competitions/Competitions';
 import CreateCompetition from './createCompetition/CreateCompetition';
 import Competition from './comepetition/Competiton';
 import ExamResults from './examResults/ExamResults';
+import ExamResult from './examResult/ExamResult';
+import Diploma from './diploma/Diploma';
 function App() {
   
   return (
@@ -33,6 +35,12 @@ function App() {
             </Route>
             <Route exact path="/examResults/:id">
               <ExamResults/>
+            </Route>
+            <Route exact path="/examResult">
+              <ExamResult/>
+            </Route>
+            <Route exact path="/diploma/:id">
+              <Diploma/>
             </Route>
             <Route path="*">
               <ErrorPage/>

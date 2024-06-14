@@ -29,6 +29,15 @@ const Competition: React.FC = () => {
         history.push(`/examResults/${competition._id}`);
       }
   
+      function handleExamResul(e: { preventDefault: () => void; }) {
+        e.preventDefault();    
+
+        history.push({
+          pathname: '/examResult',
+          state: { competitionId: id },
+        });
+      }
+
     return (
         <div className="competition-container">
           <h1>Competition Details</h1>
@@ -83,6 +92,7 @@ const Competition: React.FC = () => {
           <span>{competition.contactInformation}</span>
         </div>
         <div className="button">
+          <button className="results" onClick={handleExamResul}>Add Results</button>
           <button onClick={handleSubmit}>Results</button>
         </div>
       </div>
