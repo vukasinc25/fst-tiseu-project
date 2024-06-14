@@ -1,4 +1,4 @@
-import './Competition.css';
+import './CreateCompetition.css';
 import { useState } from "react";
 import customFetch from "../intersceptor/interceptor";
 
@@ -33,6 +33,7 @@ const Competition = () => {
             contactInformation: ""
         });
     };
+    
     
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();

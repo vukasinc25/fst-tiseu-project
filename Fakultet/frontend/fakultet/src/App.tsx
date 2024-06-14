@@ -3,8 +3,10 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import ErrorPage from './ErrorPage';
 import Form from './Form';
 import Login from './login/Login';
-import Competition from './competition/Competition';
 import Competitions from './competitions/Competitions';
+import CreateCompetition from './createCompetition/CreateCompetition';
+import Competition from './comepetition/Competiton';
+import ExamResults from './examResults/ExamResults';
 function App() {
   
   return (
@@ -18,13 +20,19 @@ function App() {
               <Login/>
             </Route>
             <Route exact path="/competition">
-              <Competition/>
+              <CreateCompetition/>
             </Route>
             <Route exact path="/competitions">
               <Competitions/>
             </Route>
+            <Route exact path="/competition/:id">
+              <Competition/>
+            </Route>
             <Route exact path="/form">
               <Form/>
+            </Route>
+            <Route exact path="/examResults/:id">
+              <ExamResults/>
             </Route>
             <Route path="*">
               <ErrorPage/>

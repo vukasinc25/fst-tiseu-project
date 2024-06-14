@@ -235,6 +235,26 @@ func (nh *newHandler) GetAllCompetitions(w http.ResponseWriter, req *http.Reques
 	encodeToJson(w, results)
 }
 
+func (nh *newHandler) GetCompetitionById(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetCompetitionById")
+
+	vars := mux.Vars(req)
+
+	id := vars["id"]
+
+	id = strings.Trim(id, "\"")
+	log.Println("Id: ", id)
+
+	results, err := nh.repo.GetCompetitionById(id)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Cant return competition", http.StatusInternalServerError)
+		return
+	}
+
+	encodeToJson(w, results)
+}
+
 // Registrating logged user to the Fakulty Competition
 func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateRegistrationUserToCompetition")

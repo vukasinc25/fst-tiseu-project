@@ -8,6 +8,7 @@ import (
 
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -274,7 +275,7 @@ func (nr *NewRepository) GetAllExamResultsByCompetitionId(competitionId string) 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	competitionId = "6658d76eed49f71587b7c4b1" // Note: This line is for testing purposes and can be removed
+	// competitionId = "6658d76eed49f71587b7c4b1" // Note: This line is for testing purposes and can be removed
 
 	resultatCollection, err := nr.getCollection(5)
 	if err != nil {
@@ -354,6 +355,25 @@ func (nr *NewRepository) GetDiplomaByUserId(userId string) (*model.Diploma, erro
 		return nil, err
 	}
 	return &diploma, nil
+}
+
+func (nr *NewRepository) GetCompetitionById(id string) (*model.Competition, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	competitionCollection, err := nr.getCollection(1)
+	if err != nil {
+		log.Println("Error getting collection: ", err)
+		return nil, err
+	}
+	var competition model.Competition
+	objId, _ := primitive.ObjectIDFromHex(id)
+	err = competitionCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&competition)
+	if err != nil {
+		log.Println("Error decoding user document: ", err)
+		return nil, err
+	}
+	return &competition, nil
 }
 
 func (nr *NewRepository) getCollection(id int) (*mongo.Collection, error) {
