@@ -383,6 +383,26 @@ func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Reques
 	encodeToJson(w, diploma)
 }
 
+func (nh *newHandler) GetStudyProgramById(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetStudyProgramById")
+
+	vars := mux.Vars(req)
+
+	id := vars["id"]
+
+	id = strings.Trim(id, "\"")
+	log.Println("Id: ", id)
+
+	studyProgram, err := nh.repo.GetStudyProgramId(id)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, "Study program with that id dont exist", http.StatusInternalServerError)
+		return
+	}
+
+	encodeToJson(w, studyProgram)
+}
+
 func (nh *newHandler) GetAllExamResultsByCompetitionId(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u GetAllExamResultsByCompetitionId")
 	vars := mux.Vars(req)

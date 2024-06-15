@@ -316,6 +316,27 @@ func (nr *NewRepository) GetAllExamResultsByCompetitionId(competitionId string) 
 	return &examResults, nil
 }
 
+func (nr *NewRepository) GetStudyProgramId(id string) (*model.StudyProgram, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	studyProgramCollection, err := nr.getCollection(8)
+	if err != nil {
+		log.Println("Error getting collection: ", err)
+		return nil, err
+	}
+
+	var studyProgram model.StudyProgram
+
+	objId, _ := primitive.ObjectIDFromHex(id)
+	err = studyProgramCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&studyProgram)
+	if err != nil {
+		log.Println("Error decoding user document: ", err)
+		return nil, err
+	}
+	return &studyProgram, nil
+}
+
 func (nr *NewRepository) InsertDiploma(diploma *model.Diploma) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

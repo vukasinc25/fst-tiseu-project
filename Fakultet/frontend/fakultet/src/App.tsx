@@ -9,6 +9,9 @@ import Competition from './comepetition/Competiton';
 import ExamResults from './examResults/ExamResults';
 import ExamResult from './examResult/ExamResult';
 import Diploma from './diploma/Diploma';
+import Departments from './departments/Departments';
+import StudyPrograms from './studyPrograms/StudyPrograms';
+import StudyProgram from './studyProgram/StudyProgram';
 function App() {
   
   return (
@@ -41,6 +44,15 @@ function App() {
             </Route>
             <Route exact path="/diploma/:id">
               <Diploma/>
+            </Route>
+            <Route exact path="/departments">
+              <Departments/>
+            </Route>
+            <Route exact path="/studyPrograms">
+              <StudyPrograms/>
+            </Route>
+            <Route exact path="/studyProgram/:id">
+              <StudyProgram/>
             </Route>
             <Route path="*">
               <ErrorPage/>

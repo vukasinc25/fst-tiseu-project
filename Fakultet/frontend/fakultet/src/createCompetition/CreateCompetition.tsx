@@ -45,19 +45,6 @@ const Competition = () => {
                 },
                 body: JSON.stringify(formData),
             });
-            // setFormData({
-            //     programName: formData.programName,
-            //     admissionRequirements: formData.admissionRequirements,
-            //     examDate: formData.examDate,
-            //     examFormat: formData.examFormat,
-            //     examMaterials: formData.examMaterials,
-            //     applicationDeadlines: formData.applicationDeadlines,
-            //     applicationDocuments: formData.applicationDocuments,
-            //     applicationMethod: formData.applicationMethod,
-            //     applicationContact: formData.applicationContact,
-            //     tuitionFees: formData.tuitionFees,
-            //     contactInformation: formData.contactInformation
-            // });
 
             clearForm();
         } catch (error) {

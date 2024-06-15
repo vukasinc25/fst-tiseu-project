@@ -38,7 +38,6 @@ func main() {
 		return
 	}
 	defer newRepository.Disconnect(timeoutContext)
-
 	newRepository.Ping()
 
 	server, err := handler.NewHandler(newRepository)
@@ -63,6 +62,7 @@ func main() {
 	router.HandleFunc("/fakultet/departments", server.GetAllDepartments).Methods("GET")
 	router.HandleFunc("/fakultet/studyProgram", server.CreateStudyProgram).Methods("POST")
 	router.HandleFunc("/fakultet/studyPrograms", server.GetAlltudyPrograms).Methods("GET")
+	router.HandleFunc("/fakultet/studyProgram/{id}", server.GetStudyProgramById).Methods("GET")
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
