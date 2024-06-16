@@ -43,7 +43,7 @@ function App() {
             <Route exact path="/examResult">
               <ExamResult/>
             </Route>
-            <Route exact path="/diploma/:id">
+            <Route exact path="/diploma">
               <Diploma/>
             </Route>
             <Route exact path="/departments">

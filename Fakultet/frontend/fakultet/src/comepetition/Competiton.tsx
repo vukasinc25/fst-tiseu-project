@@ -37,6 +37,25 @@ const Competition: React.FC = () => {
           state: { competitionId: id },
         });
       }
+      
+      function handleRegister(e: { preventDefault: () => void; }) {
+        e.preventDefault();    
+
+        try {
+          const data = customFetch(`http://localhost:8001/fakultet/user/registerToCompetition/${id}`,{
+            method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(null),
+          });
+          setCompetition(data);
+          console.log("Data: ",data)
+          history.push('/competitions')
+        } catch (error) {
+          console.error('Failed to fetch competitions:', error);
+        }
+      }
 
     return (
         <div className="competition-container">
@@ -92,6 +111,7 @@ const Competition: React.FC = () => {
           <span>{competition.contactInformation}</span>
         </div>
         <div className="button">
+          <button className="results" onClick={handleRegister}>Register</button>
           <button className="results" onClick={handleExamResul}>Add Results</button>
           <button onClick={handleSubmit}>Results</button>
         </div>

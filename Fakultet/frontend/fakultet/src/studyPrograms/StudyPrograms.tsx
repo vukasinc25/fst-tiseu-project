@@ -27,7 +27,7 @@ const StudyPrograms = () => {
 
     return (  
     <div className="App1">
-      <h1>StudyPrograms</h1>
+      <h1>Study Programs</h1>
       <div className="button-container">
         <button className="createStudyProgram" onClick={handleSubmit}>Create Study Program</button>
       </div>

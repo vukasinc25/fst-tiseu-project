@@ -4,14 +4,12 @@ import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
 import { RouteParams } from "../intefaces/routeParams";
 const Diploma = () => {
-    const { id } = useParams<RouteParams>();
-
     const [diploma, setDiploma] = useState<any>(null);
 
     useEffect(() => {
         const fetchDiploma = async () => {
             try {
-                const data = await customFetch(`http://localhost:8001/fakultet/user/diplomaByUserId/${id}`);
+                const data = await customFetch(`http://localhost:8001/fakultet/user/diplomaByUserId`);
                 setDiploma(data);
                 console.log("Data: ", data);
             } catch (error) {
@@ -20,7 +18,7 @@ const Diploma = () => {
         };
 
         fetchDiploma();
-    }, [id]);
+    }, []);
     
     return (
         <div className="diploma-details">

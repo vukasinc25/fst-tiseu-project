@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime"
 	"net/http"
@@ -16,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"github.com/vukasinc25/fst-tiseu-project/repository"
+	"github.com/vukasinc25/fst-tiseu-project/token"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -259,53 +258,76 @@ func (nh *newHandler) GetCompetitionById(w http.ResponseWriter, req *http.Reques
 func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateRegistrationUserToCompetition")
 
-	ctx := req.Context()
+	//TREBA TI ZA POVEZIVANJE SA SREDNOJM SKOLOM I DOBAVLJANJE DIPLOME OD NJE!!!!!
+	// ctx := req.Context()
 
-	token, ok := ctx.Value("accessToken").(string)
-	if !ok || token == "" {
-		sendErrorWithMessage(w, "Authorization token not found", http.StatusInternalServerError)
-		return
-	}
-
-	log.Println("Token: ", token)
-
-	req.Header.Set("Content-Type", "application/json")
-
-	// Set the Authorization header with the Bearer token
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	// send request to the high school service(high school service not created still)
-	url := "http://auth-service:8000/users/auth"
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
-		fmt.Println("Error creating request:", err)
-		return
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Error sending request:", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return
-	}
-
-	log.Println("Body: ", string(body))
-
-	// rt.ID = primitive.NewObjectID()
-
-	// err = nh.repo.CreateRegisteredStudentToTheCommpetition(rt)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
+	// token, ok := ctx.Value("accessToken").(string)
+	// if !ok || token == "" {
+	// 	sendErrorWithMessage(w, "Authorization token not found", http.StatusInternalServerError)
 	// 	return
 	// }
+
+	// log.Println("Token: ", token)
+
+	// req.Header.Set("Content-Type", "application/json")
+
+	// // Set the Authorization header with the Bearer token
+	// req.Header.Set("Authorization", "Bearer "+token)
+
+	// // send request to the high school service(high school service not created still)
+	// url := "http://auth-service:8000/users/auth"
+	// req, err := http.NewRequest("POST", url, nil)
+	// if err != nil {
+	// 	fmt.Println("Error creating request:", err)
+	// 	return
+	// }
+
+	// client := &http.Client{}
+	// resp, err := client.Do(req)
+	// if err != nil {
+	// 	fmt.Println("Error sending request:", err)
+	// 	return
+	// }
+	// defer resp.Body.Close()
+
+	// body, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	// 	fmt.Println("Error reading response body:", err)
+	// 	return
+	// }
+
+	// log.Println("Body: ", string(body))
+	vars := mux.Vars(req)
+
+	id := vars["id"]
+
+	id = strings.Trim(id, "\"")
+	log.Println("Id: ", id)
+
+	authPayload, ok := req.Context().Value("authorization_payload").(*token.Payload)
+	if !ok {
+		// Handle case where authorization_payload is not found in context
+		http.Error(w, "authorization_payload not found in context", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Payload: ", authPayload)
+
+	userId := authPayload.ID.Hex()
+	userId = strings.Trim(userId, "\"")
+
+	rt := &model.RegisteredStudentsToCommpetition{
+		CompetitionID: id,
+		UserID:        userId,
+	}
+
+	rt.ID = primitive.NewObjectID()
+
+	err := nh.repo.CreateRegisteredStudentToTheCommpetition(rt)
+	if err != nil {
+		log.Println(err)
+		sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	sendErrorWithMessage(w, "User successfuly registerd to the competition", http.StatusCreated)
 }
@@ -350,29 +372,26 @@ func (nh *newHandler) CreateUserExamResult(w http.ResponseWriter, req *http.Requ
 
 func (nh *newHandler) GetDiplomaByUserId(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u GetDiplomaByUserId")
+	//treba ti payload zato sto nemas id od logovanog korisnika tako da kada posalje zahtev ne moras da prosledjujes id
 
-	// ctx := req.Context()
-	// log.Println("Ctx: ", ctx)
+	authPayload, ok := req.Context().Value("authorization_payload").(*token.Payload)
+	if !ok {
+		// Handle case where authorization_payload is not found in context
+		http.Error(w, "authorization_payload not found in context", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Payload: ", authPayload)
 
-	// authPayload, ok := ctx.Value("authorization_payload").(*token.Payload)
-	// if !ok || authPayload == nil {
-	// 	log.Println("AuthPayload: ", authPayload)
-	// 	sendErrorWithMessage(w, "Authorization payload not found", http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// log.Println("Payload: ", authPayload)
-
-	// id := authPayload.ID.Hex()
-	// id = strings.Trim(id, "\"")
-	// log.Println("Id: ", id)
-
-	vars := mux.Vars(req)
-
-	id := vars["id"]
-
+	id := authPayload.ID.Hex()
 	id = strings.Trim(id, "\"")
 	log.Println("Id: ", id)
+
+	// vars := mux.Vars(req)
+
+	// id := vars["id"]
+
+	// id = strings.Trim(id, "\"")
+	// log.Println("Id: ", id)
 
 	diploma, err := nh.repo.GetDiplomaByUserId(id)
 	if err != nil {
