@@ -1,4 +1,3 @@
-import Navbar from './Navbar';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import ErrorPage from './ErrorPage';
 import Form from './Form';
@@ -12,12 +11,14 @@ import Diploma from './diploma/Diploma';
 import Departments from './departments/Departments';
 import StudyPrograms from './studyPrograms/StudyPrograms';
 import StudyProgram from './studyProgram/StudyProgram';
+import Navbar from './navbar/Navbar';
+import CreateStudyProgram from './createStudyProgram/CreateStudyProgram';
 function App() {
   
   return (
     <Router>
       <div className="App">
-        <Navbar paragraf={"Sta mai"} title="Dje ste mangupi"/>
+        <Navbar/>
         <div className="content">
           <Switch>
             <Route exact path="/">
@@ -53,6 +54,9 @@ function App() {
             </Route>
             <Route exact path="/studyProgram/:id">
               <StudyProgram/>
+            </Route>
+            <Route exact path="/studyProgram">
+              <CreateStudyProgram/>
             </Route>
             <Route path="*">
               <ErrorPage/>

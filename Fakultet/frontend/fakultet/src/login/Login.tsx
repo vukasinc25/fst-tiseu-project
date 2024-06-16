@@ -44,17 +44,20 @@ const Login = () => {
     };
 
     return (
-        <form className='form1' onSubmit={handleSubmit}>
-            <label>
-                Username:
-            </label>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
-            <label>
-                Password:
-            </label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-            <input type="submit" value="Submit" />
-        </form>
+        <div>
+            <h1>Login</h1>
+            <form className='form1' onSubmit={handleSubmit}>
+                <label>
+                    Username:
+                </label>
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
+                <label>
+                    Password:
+                </label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
     );
 }
 

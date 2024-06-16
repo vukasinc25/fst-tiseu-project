@@ -73,8 +73,8 @@ const Competitions = () => {
         <button className="createCompetition" onClick={handleSubmit}>Create Competition</button>
       </div>
       <div className="competitions-grid">
-        {competitions.map((competition: any, index) => (
-          <div key={index} className="competition-card">
+        {competitions.map((competition: any) => (
+          <div key={competition._id} className="competition-card">
             <h3 className="competition-name">
               <Link className="competition-link" to={`/competition/${competition._id}`}>{competition.programName}</Link>
             </h3>

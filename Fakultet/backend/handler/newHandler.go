@@ -78,6 +78,7 @@ func (nh *newHandler) GetAlltudyPrograms(w http.ResponseWriter, req *http.Reques
 }
 
 func (nh *newHandler) GetAllDepartments(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetAllDepartments")
 
 	departments, err := nh.repo.GetAllDepartments()
 	if err != nil {

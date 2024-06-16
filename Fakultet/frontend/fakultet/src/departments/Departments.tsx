@@ -22,11 +22,11 @@ const Departments = () => {
     <div className="App1">
       <h1>Departments</h1>
       <div className="departments-grid">
-        {departments.map((department: any, index) => (
-          <div key={index} className="department-card">
+        {departments.map((department: any) => (
+          <div key={department._id} className="department-card">
             <h2 className="department-name">{department.name}</h2>
             {department.staff.map((worker:any) => (
-                <li key={index} className="staff-list-item">
+                <li key={worker._id} className="staff-list-item">
                      <strong>Employee: {worker.username}</strong>
                 </li>
             ))}

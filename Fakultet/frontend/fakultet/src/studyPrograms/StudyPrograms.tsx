@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import "./StudyPrograms.css"
 import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
 const StudyPrograms = () => {
     const [studyPrograms, setStudyPrograms] = useState([]);
+    const history = useHistory();
 
     useEffect(() => {
         fetchCompetitions();
@@ -19,12 +20,20 @@ const StudyPrograms = () => {
         }
     };
 
+    function handleSubmit(e: { preventDefault: () => void; }) {
+      e.preventDefault();    
+      history.push("/studyProgram");
+    }
+
     return (  
     <div className="App1">
       <h1>StudyPrograms</h1>
+      <div className="button-container">
+        <button className="createStudyProgram" onClick={handleSubmit}>Create Study Program</button>
+      </div>
       <div className="study-programs-grid">
         {studyPrograms.map((studyProgram: any) => (
-           <div className="study-program-card">
+           <div key={studyProgram._id} className="study-program-card">
            <h3 className="study-program-name">
              <Link className="study-program-link" to={`/studyProgram/${studyProgram._id}`}>{studyProgram.name}</Link>
            </h3>

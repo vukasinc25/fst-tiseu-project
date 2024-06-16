@@ -27,6 +27,33 @@
     color: black;
     text-decoration: none;
   }
+
+  .button-container {
+    text-align: left; /* Aligns button to the left */
+    margin-bottom: 20px; /* Adds space below the button */
+    width: 80%; /* Same width as the grid */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .createStudyProgram {
+    background-color: #4CAF50; /* Green background */
+    border: none; /* Remove border */
+    color: white; /* White text */
+    padding: 15px 32px; /* Some padding */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make the button an inline block */
+    font-size: 16px; /* Increase font size */
+    margin: 4px 2px; /* Some margin */
+    cursor: pointer; /* Pointer/hand icon */
+    transition-duration: 0.4s; /* 0.4 second transition effect */
+  }
+  
+  .createStudyProgram:hover {
+    background-color: white; /* White background */
+    color: black; /* Black text */
+  }
   
   .study-program-link:hover {
     color: white;
