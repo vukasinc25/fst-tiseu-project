@@ -1,8 +1,6 @@
 import "./Diploma.css"
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
-import { RouteParams } from "../intefaces/routeParams";
 const Diploma = () => {
     const [diploma, setDiploma] = useState<any>(null);
 

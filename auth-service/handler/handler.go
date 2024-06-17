@@ -150,7 +150,7 @@ func jwtToken(user *model.User, w http.ResponseWriter, uh *UserHandler) {
 	accessToken, accessPayload, err := uh.jwtMaker.CreateToken(
 		user.ID,
 		user.Username,
-		string(user.Role),
+		user.Role,
 		duration,
 	)
 

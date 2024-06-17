@@ -13,6 +13,7 @@ import StudyPrograms from './studyPrograms/StudyPrograms';
 import StudyProgram from './studyProgram/StudyProgram';
 import Navbar from './navbar/Navbar';
 import CreateStudyProgram from './createStudyProgram/CreateStudyProgram';
+import ProtectedRoute from './role-base/Auth';
 function App() {
   
   return (
@@ -25,7 +26,18 @@ function App() {
               {/* <Home /> */}
               <Login/>
             </Route>
-            <Route exact path="/competition">
+            <ProtectedRoute exact path="/competition" component={CreateCompetition} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/competitions" component={Competitions} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/competition/:id" component={Competition} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/form" component={Form} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/examResults/:id" component={ExamResults} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/examResult" component={ExamResult} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/diploma" component={Diploma} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/departments" component={Departments} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/studyPrograms" component={StudyPrograms} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/studyProgram/:id" component={StudyProgram} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/studyProgram" component={CreateStudyProgram} roles={['ADMIN']} />
+            {/* <Route exact path="/competition">
               <CreateCompetition/>
             </Route>
             <Route exact path="/competitions">
@@ -57,7 +69,7 @@ function App() {
             </Route>
             <Route exact path="/studyProgram">
               <CreateStudyProgram/>
-            </Route>
+            </Route> */}
             <Route path="*">
               <ErrorPage/>
             </Route>

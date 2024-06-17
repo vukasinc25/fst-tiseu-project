@@ -103,7 +103,7 @@ func (nr *NewRepository) Insert(newUser *model.User, ctx context.Context) error 
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	usersCollection, err := nr.getCollection(3)
+	usersCollection, err := nr.getCollection(7)
 	if err != nil {
 		log.Println("Duplicate key error: ", err)
 		return err
@@ -405,8 +405,8 @@ func (nr *NewRepository) getCollection(id int) (*mongo.Collection, error) {
 		competitionCollection = competitionDatabase.Collection("competitions")
 	case 2:
 		competitionCollection = competitionDatabase.Collection("registeredStudentsToCommpetition")
-	case 3:
-		competitionCollection = competitionDatabase.Collection("fakultetUsers")
+	// case 3:
+	// 	competitionCollection = competitionDatabase.Collection("fakultetUsers")
 	case 4:
 		competitionCollection = competitionDatabase.Collection("diplomas")
 	case 5:

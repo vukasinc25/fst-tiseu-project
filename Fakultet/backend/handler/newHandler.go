@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime"
 	"net/http"
@@ -126,6 +128,11 @@ func (nh *newHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	log.Println("Before decodeBody")
+	bodyBytes, _ := ioutil.ReadAll(req.Body)
+	log.Println("Request Body: ", string(bodyBytes))
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
 	log.Println("Pre decodeBody")
 	rt, err := decodeBody(req.Body)
 	if err != nil {
@@ -133,6 +140,7 @@ func (nh *newHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
 		return
 	}
+	rt.ID = primitive.NewObjectID()
 
 	err = nh.repo.Insert(rt, ctx)
 	if err != nil {
