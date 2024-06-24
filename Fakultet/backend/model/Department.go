@@ -5,9 +5,9 @@ import (
 )
 
 type Department struct {
-	ID    primitive.ObjectID `json:"_id"`
-	Name  string             `json:"name"`
-	Staff []*User            `json:"staff"`
+	ID    primitive.ObjectID
+	Name  string
+	Staff []*User
 }
 
 type DepartmentDB struct {

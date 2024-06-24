@@ -13,18 +13,15 @@ type ReqToken struct {
 type Role string
 
 const (
-	Host      Role = "HOST"
-	Guest     Role = "GUEST"
-	STUDENT   Role = "STUDENT"
-	PROFESSOR Role = "PROFESSOR"
-	ADMIN     Role = "ADMIN"
+	Host  Role = "HOST"
+	Guest Role = "GUEST"
 )
 
 type User struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Username  string             `bson:"username,omitempty" json:"username" validate:"required,min=6"`
 	Password  string             `bson:"password,omitempty" json:"password" validate:"required,password"`
-	Role      []Role             `bson:"role,omitempty" json:"role" validate:"required,oneof=HOST GUEST"`
+	Role      Role               `bson:"role,omitempty" json:"role" validate:"required,oneof=HOST GUEST"`
 	Email     string             `bson:"email,omitempty" json:"email" validate:"required,email"`
 	FirstName string             `bson:"firstname,omitempty" json:"firstname"`
 	LastName  string             `bson:"lastname,omitempty" json:"lastname"`

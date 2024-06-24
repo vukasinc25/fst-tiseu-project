@@ -8,7 +8,6 @@ import (
 
 	"github.com/vukasinc25/fst-tiseu-project/model"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -76,34 +75,11 @@ func (uh *NewRepository) Ping() {
 	fmt.Println(databases)
 }
 
-func (nr *NewRepository) GetAllCompetitions() (*model.Competitions, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	competitionCollection, err := nr.getCollection(1)
-	if err != nil {
-		log.Println("Duplicate key error: ", err)
-		return nil, err
-	}
-
-	var competitons model.Competitions
-	cursor, err := competitionCollection.Find(ctx, bson.M{})
-	if err != nil {
-		log.Println("Cant find departmentCollection: ", err)
-		return nil, err
-	}
-	if err = cursor.All(ctx, &competitons); err != nil {
-		log.Println("Department Cursor.All: ", err)
-		return nil, err
-	}
-	return &competitons, nil
-}
-
 func (nr *NewRepository) Insert(newUser *model.User, ctx context.Context) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	usersCollection, err := nr.getCollection(7)
+	usersCollection, err := nr.getCollection(3)
 	if err != nil {
 		log.Println("Duplicate key error: ", err)
 		return err
@@ -275,7 +251,7 @@ func (nr *NewRepository) GetAllExamResultsByCompetitionId(competitionId string) 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// competitionId = "6658d76eed49f71587b7c4b1" // Note: This line is for testing purposes and can be removed
+	competitionId = "6658d76eed49f71587b7c4b1" // Note: This line is for testing purposes and can be removed
 
 	resultatCollection, err := nr.getCollection(5)
 	if err != nil {
@@ -314,27 +290,6 @@ func (nr *NewRepository) GetAllExamResultsByCompetitionId(competitionId string) 
 	log.Println("Results: ", examResults)
 
 	return &examResults, nil
-}
-
-func (nr *NewRepository) GetStudyProgramId(id string) (*model.StudyProgram, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	studyProgramCollection, err := nr.getCollection(8)
-	if err != nil {
-		log.Println("Error getting collection: ", err)
-		return nil, err
-	}
-
-	var studyProgram model.StudyProgram
-
-	objId, _ := primitive.ObjectIDFromHex(id)
-	err = studyProgramCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&studyProgram)
-	if err != nil {
-		log.Println("Error decoding user document: ", err)
-		return nil, err
-	}
-	return &studyProgram, nil
 }
 
 func (nr *NewRepository) InsertDiploma(diploma *model.Diploma) error {
@@ -378,25 +333,6 @@ func (nr *NewRepository) GetDiplomaByUserId(userId string) (*model.Diploma, erro
 	return &diploma, nil
 }
 
-func (nr *NewRepository) GetCompetitionById(id string) (*model.Competition, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	competitionCollection, err := nr.getCollection(1)
-	if err != nil {
-		log.Println("Error getting collection: ", err)
-		return nil, err
-	}
-	var competition model.Competition
-	objId, _ := primitive.ObjectIDFromHex(id)
-	err = competitionCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&competition)
-	if err != nil {
-		log.Println("Error decoding user document: ", err)
-		return nil, err
-	}
-	return &competition, nil
-}
-
 func (nr *NewRepository) getCollection(id int) (*mongo.Collection, error) {
 	competitionDatabase := nr.cli.Database("mongoDemo")
 	var competitionCollection *mongo.Collection
@@ -405,8 +341,8 @@ func (nr *NewRepository) getCollection(id int) (*mongo.Collection, error) {
 		competitionCollection = competitionDatabase.Collection("competitions")
 	case 2:
 		competitionCollection = competitionDatabase.Collection("registeredStudentsToCommpetition")
-	// case 3:
-	// 	competitionCollection = competitionDatabase.Collection("fakultetUsers")
+	case 3:
+		competitionCollection = competitionDatabase.Collection("fakultetUsers")
 	case 4:
 		competitionCollection = competitionDatabase.Collection("diplomas")
 	case 5:
