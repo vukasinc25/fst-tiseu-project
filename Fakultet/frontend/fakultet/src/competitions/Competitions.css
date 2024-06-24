@@ -1,0 +1,76 @@
+.App1 {
+  text-align: center;
+}
+
+.competitions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 80%;
+  margin: auto;
+}
+
+.competition-card {
+  background: #61cffb;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.competition-name {
+  margin: 0 0 10px 0;
+  font-size: 1.5em;
+  border-bottom: 2px solid #000; /* Adds an underline */
+}
+
+.competition-link {
+  color: black;
+  text-decoration: none;
+}
+
+.competition-name:hover {
+  color: white;
+}
+
+.competition-card p {
+  margin: 5px 0;
+}
+
+.createCompetition {
+  background-color: #4CAF50; /* Green background */
+  border: none; /* Remove border */
+  color: white; /* White text */
+  padding: 15px 32px; /* Some padding */
+  text-align: center; /* Centered text */
+  text-decoration: none; /* Remove underline */
+  display: inline-block; /* Make the button an inline block */
+  font-size: 16px; /* Increase font size */
+  margin: 4px 2px; /* Some margin */
+  cursor: pointer; /* Pointer/hand icon */
+  transition-duration: 0.4s; /* 0.4 second transition effect */
+}
+
+.createCompetition:hover {
+  background-color: white; /* White background */
+  color: black; /* Black text */
+}
+
+.button-container {
+  text-align: left; /* Aligns button to the left */
+  margin-bottom: 20px; /* Adds space below the button */
+  width: 80%; /* Same width as the grid */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .competitions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .competitions-grid {
+    grid-template-columns: 1fr;
+  }
+}

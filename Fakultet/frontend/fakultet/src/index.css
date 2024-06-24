@@ -12,3 +12,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.button-link {
+  text-decoration: none;
+}
+
+.content{
+  margin-top: 70px;
+}

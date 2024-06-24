@@ -118,7 +118,7 @@ func (uh *UserHandler) LoginUser(w http.ResponseWriter, req *http.Request) {
 	user, err := uh.db.GetUserByUsername(username, ctx)
 	if err != nil {
 		log.Println("mongo: no documents in result: treba da se registuje neko")
-		sendErrorWithMessage(w, "No such user", http.StatusBadRequest)
+		sendErrorWithMessage(w, "No such user", http.StatusNotFound)
 		return
 	}
 
@@ -150,7 +150,7 @@ func jwtToken(user *model.User, w http.ResponseWriter, uh *UserHandler) {
 	accessToken, accessPayload, err := uh.jwtMaker.CreateToken(
 		user.ID,
 		user.Username,
-		string(user.Role),
+		user.Role,
 		duration,
 	)
 

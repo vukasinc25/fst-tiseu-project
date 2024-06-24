@@ -1,0 +1,50 @@
+.App2{
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.form2 {
+    width: 600px;
+    margin: 0 auto;
+    background-color: #f2f2f2; 
+    border-radius: 10px;
+    padding: 60px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+input[type="text"],
+input[type="date"] {
+    width: 100%;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; 
+}
+
+button{
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:disabled {
+    background-color: #ccc; 
+    cursor: not-allowed; 
+}
+
+button:hover:enabled {
+    background-color: #0056b3; 
+}
+

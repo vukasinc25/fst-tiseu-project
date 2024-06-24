@@ -38,7 +38,6 @@ func main() {
 		return
 	}
 	defer newRepository.Disconnect(timeoutContext)
-
 	newRepository.Ping()
 
 	server, err := handler.NewHandler(newRepository)
@@ -49,19 +48,26 @@ func main() {
 
 	globalMiddleware := GlobalMiddleware(tokenMaker)
 	router.Use(globalMiddleware)
-	router.HandleFunc("/fakultet/create", server.CreateCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/createCompetition", server.CreateCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/competitions", server.GetAllCompetitions).Methods("GET")
+	router.HandleFunc("/fakultet/competition/{id}", server.GetCompetitionById).Methods("GET")
 	router.HandleFunc("/fakultet/user/create", server.CreateUser).Methods("POST")
-	router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
+	// router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/user/registerToCompetition/{id}", server.CreateRegistrationUserToCompetition).Methods("POST")
 	router.HandleFunc("/fakultet/user/diploma", server.CreateDiploma).Methods("POST")
 	router.HandleFunc("/fakultet/user/diplomaByUserId", server.GetDiplomaByUserId).Methods("GET")
+	// router.HandleFunc("/fakultet/user/diplomaByUserId/{id}", server.GetDiplomaByUserId).Methods("GET")
 	router.HandleFunc("/fakultet/user/examResults", server.CreateUserExamResult).Methods("POST")
 	router.HandleFunc("/fakultet/user/getResultsByCompetitionId/{id}", server.GetAllExamResultsByCompetitionId).Methods("GET")
 	router.HandleFunc("/fakultet/department", server.CreateDepartment).Methods("POST")
 	router.HandleFunc("/fakultet/departments", server.GetAllDepartments).Methods("GET")
 	router.HandleFunc("/fakultet/studyProgram", server.CreateStudyProgram).Methods("POST")
 	router.HandleFunc("/fakultet/studyPrograms", server.GetAlltudyPrograms).Methods("GET")
+	router.HandleFunc("/fakultet/studyProgram/{id}", server.GetStudyProgramById).Methods("GET")
 
-	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
+		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
+		gorillaHandlers.AllowedHeaders([]string{"Content-Type", "Authorization"}))
 	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: cors(router)}
 	go func() {
 		log.Println("server starting")

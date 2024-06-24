@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/vukasinc25/fst-tiseu-project/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/dgrijalva/jwt-go"
@@ -26,8 +27,8 @@ func NewJWTMaker(secretKey string) (Maker, error) {
 }
 
 // CreateToken creates a new token for a specific username and duration
-func (maker *JWTMaker) CreateToken(id primitive.ObjectID, username string, role string, duration time.Duration) (string, *Payload, error) {
-	payload, err := NewPayload(id, username, role, duration)
+func (maker *JWTMaker) CreateToken(id primitive.ObjectID, username string, roles []model.Role, duration time.Duration) (string, *Payload, error) {
+	payload, err := NewPayload(id, username, roles, duration)
 	if err != nil {
 		return "", payload, err
 	}
