@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import customFetch from "../intersceptor/interceptor";
 import { RouteParams } from "../intefaces/routeParams";
+import useRoles from "../role-base/userValidation";
 
 const Competition: React.FC = () => {
     const { id } = useParams<RouteParams>();
     const [competition, setCompetition] = useState<any>(null);
     const history = useHistory();
+    const { hasRole } = useRoles();
 
     useEffect(() => {
         fetchCompetitions();
@@ -111,8 +113,8 @@ const Competition: React.FC = () => {
           <span>{competition.contactInformation}</span>
         </div>
         <div className="button">
-          <button className="results" onClick={handleRegister}>Register</button>
-          <button className="results" onClick={handleExamResul}>Add Results</button>
+          {hasRole("STUDENT") && <button className="results" onClick={handleRegister}>Register</button>}
+          {hasRole("PROFESSOR") && <button className="results" onClick={handleExamResul}>Add Results</button>}
           <button onClick={handleSubmit}>Results</button>
         </div>
       </div>

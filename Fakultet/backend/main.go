@@ -64,6 +64,10 @@ func main() {
 	router.HandleFunc("/fakultet/studyProgram", server.CreateStudyProgram).Methods("POST")
 	router.HandleFunc("/fakultet/studyPrograms", server.GetAlltudyPrograms).Methods("GET")
 	router.HandleFunc("/fakultet/studyProgram/{id}", server.GetStudyProgramById).Methods("GET")
+	router.HandleFunc("/fakultet/diplomaRequest", server.DiplomaRequest).Methods("POST")
+	router.HandleFunc("/fakultet/diplomaRequestsInPendingState", server.GetDiplomaRequestInPendingState).Methods("GET")
+	router.HandleFunc("/fakultet/decideDiplomaReques/{id}", server.DecideDiplomaRequest).Methods("POST")
+	router.HandleFunc("/fakultet/getDiplomaRequestsForUserIdNotInPendingState", server.GetDiplomaRequestsForUserIdNotInPendingState).Methods("GET")
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),

@@ -12,3 +12,17 @@ type Diploma struct {
 	IssueDate    time.Time          `bson:"issueDate" json:"issueDate"`
 	AverageGrade string             `bson:"averageGrade" json:"averageGrade"`
 }
+
+type DiplomaRequest struct {
+	ID         primitive.ObjectID `bson:"_id" json:"_id"`
+	UserId     string             `bson:"userId" json:"userId"`
+	IssueDate  time.Time          `bson:"issueDate" json:"issueDate"`
+	InPending  bool               `bson:"inPending"`
+	IsApproved bool               `bson:"isApproved"`
+}
+
+type IsApproved struct {
+	IsApproved bool `json:"isApproved"`
+}
+
+type DiplomaRequests []*DiplomaRequest

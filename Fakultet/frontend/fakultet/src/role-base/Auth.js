@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-
+// for routes
 const ProtectedRoute = ({ component: Component, roles, ...rest }) => {
   const userRoles = JSON.parse(sessionStorage.getItem('userRoles') || '[]')
 

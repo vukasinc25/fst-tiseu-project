@@ -14,7 +14,8 @@ const Departments = () => {
           setDepartments(data);
           console.log("Data: ",data)
         } catch (error) {
-          console.error('Failed to fetch departments:', error);
+          alert("Departments mush be created!!!!!")
+          console.log('Failed to fetch departments:', error);
         }
       };
 
@@ -22,7 +23,7 @@ const Departments = () => {
     <div className="App1">
       <h1>Departments</h1>
       <div className="departments-grid">
-        {departments.map((department: any) => (
+        {departments?.map((department: any) => (
           <div key={department._id} className="department-card">
             <h2 className="department-name">{department.name}</h2>
             {department.staff.map((worker:any) => (

@@ -28,6 +28,102 @@ func NewHandler(r *repository.NewRepository) (*newHandler, error) {
 	return &newHandler{r}, nil
 }
 
+func (nh *newHandler) DiplomaRequest(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u DiplomaRequest")
+
+	authPayload, ok := req.Context().Value("authorization_payload").(*token.Payload)
+	if !ok {
+		// Handle case where authorization_payload is not found in context
+		http.Error(w, "authorization_payload not found in context", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Payload: ", authPayload)
+
+	userId := authPayload.ID.Hex()
+	userId = strings.Trim(userId, "\"")
+	log.Println("User Id: ", userId)
+
+	diplomaRequest := model.DiplomaRequest{
+		ID:         primitive.NewObjectID(),
+		UserId:     userId,
+		IssueDate:  time.Now(),
+		InPending:  true,
+		IsApproved: false,
+	}
+
+	err := nh.repo.CreateDiplomaRequest(&diplomaRequest)
+	if err != nil {
+		log.Println("Error: ", err)
+		sendErrorWithMessage(w, "Cant send request", http.StatusInternalServerError)
+		return
+	}
+
+	sendErrorWithMessage(w, "Sent", http.StatusOK)
+}
+
+func (nh *newHandler) GetDiplomaRequestInPendingState(w http.ResponseWriter, req *http.Request) {
+	diplomas, err := nh.repo.GetAllDiplomaRequestsInPendingState()
+	if err != nil {
+		log.Println("Error: ", err)
+		sendErrorWithMessage(w, "Cant get diploma requests", http.StatusInternalServerError)
+		return
+	}
+
+	encodeToJson(w, diplomas)
+}
+
+func (nh *newHandler) GetDiplomaRequestsForUserIdNotInPendingState(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetDiplomaRequestsForUserIdNotInPendingState")
+	authPayload, ok := req.Context().Value("authorization_payload").(*token.Payload)
+	if !ok {
+		// Handle case where authorization_payload is not found in context
+		http.Error(w, "authorization_payload not found in context", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Payload: ", authPayload)
+
+	userId := authPayload.ID.Hex()
+	userId = strings.Trim(userId, "\"")
+	log.Println("User Id: ", userId)
+
+	requests, err := nh.repo.GetDiplomaRequestsForUserIdNotInPendingState(userId)
+	if err != nil {
+		log.Println("Cant get requests: ", err)
+		sendErrorWithMessage(w, "Cant get request", http.StatusInternalServerError)
+		return
+	}
+
+	encodeToJson(w, requests)
+}
+
+func (nh *newHandler) DecideDiplomaRequest(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u DecideDiplomaRequest")
+	vars := mux.Vars(req)
+
+	id := vars["id"]
+
+	id = strings.Trim(id, "\"")
+	log.Println("Id: ", id)
+	// var result = true
+
+	isApproved, err := decodeIsApproved(req.Body)
+	if err != nil {
+		log.Println("Cant decode body: ", err)
+		sendErrorWithMessage(w, "Cant decode body", http.StatusBadRequest)
+		return
+	}
+
+	log.Println(isApproved.IsApproved)
+	err = nh.repo.UpdateDiplomaRequest(id, isApproved.IsApproved)
+	if err != nil {
+		log.Println("Cant update diploma request: ", err)
+		sendErrorWithMessage(w, "Cant update diploma request", http.StatusInternalServerError)
+		return
+	}
+
+	sendErrorWithMessage(w, "Ok", http.StatusOK)
+}
+
 func (nh *newHandler) CreateStudyProgram(w http.ResponseWriter, req *http.Request) {
 	log.Println("Usli u CreateStudyProgram")
 
@@ -485,6 +581,19 @@ func (nh *newHandler) CreateDepartment(w http.ResponseWriter, req *http.Request)
 	}
 
 	sendErrorWithMessage(w, "Department inserted", http.StatusCreated)
+}
+
+func decodeIsApproved(r io.Reader) (*model.IsApproved, error) {
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+
+	var rt model.IsApproved
+	if err := dec.Decode(&rt); err != nil {
+		log.Println("Decode cant be done")
+		return nil, err
+	}
+
+	return &rt, nil
 }
 
 func decodeCompetitionBody(r io.Reader) (*model.Competition, error) {

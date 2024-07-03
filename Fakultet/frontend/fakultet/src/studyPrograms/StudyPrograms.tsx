@@ -32,7 +32,7 @@ const StudyPrograms = () => {
         <button className="createStudyProgram" onClick={handleSubmit}>Create Study Program</button>
       </div>
       <div className="study-programs-grid">
-        {studyPrograms.map((studyProgram: any) => (
+        {studyPrograms?.map((studyProgram: any) => (
            <div key={studyProgram._id} className="study-program-card">
            <h3 className="study-program-name">
              <Link className="study-program-link" to={`/studyProgram/${studyProgram._id}`}>{studyProgram.name}</Link>

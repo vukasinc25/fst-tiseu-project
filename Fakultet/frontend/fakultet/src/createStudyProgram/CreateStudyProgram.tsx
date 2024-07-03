@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
 import "./CreateStudyProgram.css"
+import useRoles from "../role-base/userValidation";
 const CreateStudyProgram = () => {
     const [formData, setFormData] = useState({
         name: "",
@@ -17,6 +18,8 @@ const CreateStudyProgram = () => {
     });
 
     const [departments, setDepartments] = useState([]);
+    const [fetchError, setFetchError] = useState(false);
+    const {hasRole} = useRoles();
 
     useEffect(() => {
         fetchDepartments();
@@ -27,8 +30,10 @@ const CreateStudyProgram = () => {
             const data = await customFetch('http://localhost:8001/fakultet/departments');
             setDepartments(data);
             console.log("Departments: ",data)
+            setFetchError(false)
         } catch (error) {
             console.error('Failed to fetch departments:', error);
+            setFetchError(true)
         }
     };
 
@@ -188,14 +193,17 @@ const CreateStudyProgram = () => {
                         onChange={handleChange}
                     >
                         <option value=""></option>
-                        {departments.map((department: any) => (
+                        {departments?.map((department: any) => (
                             <option key={department._id} value={department._id}>
                                 {department.name}
                             </option>
                         ))}
                     </select>
                 </label>
-                <button type="submit" disabled={isFormEmpty()}>Create Study Program</button>
+                <br/>
+                {!fetchError && <p>Failed to load departments. Please try again later.</p>}
+                <br/>
+                {hasRole("ADMIN") && <button type="submit" disabled={isFormEmpty()}>Create Study Program</button>}
             </form>
         </div>
     );
