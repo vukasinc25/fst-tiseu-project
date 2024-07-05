@@ -54,9 +54,7 @@ func main() {
 	router.HandleFunc("/fakultet/user/create", server.CreateUser).Methods("POST")
 	// router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
 	router.HandleFunc("/fakultet/user/registerToCompetition/{id}", server.CreateRegistrationUserToCompetition).Methods("POST")
-	router.HandleFunc("/fakultet/user/diploma", server.CreateDiploma).Methods("POST")
 	router.HandleFunc("/fakultet/user/diplomaByUserId", server.GetDiplomaByUserId).Methods("GET")
-	// router.HandleFunc("/fakultet/user/diplomaByUserId/{id}", server.GetDiplomaByUserId).Methods("GET")
 	router.HandleFunc("/fakultet/user/examResults", server.CreateUserExamResult).Methods("POST")
 	router.HandleFunc("/fakultet/user/getResultsByCompetitionId/{id}", server.GetAllExamResultsByCompetitionId).Methods("GET")
 	router.HandleFunc("/fakultet/department", server.CreateDepartment).Methods("POST")
@@ -67,7 +65,7 @@ func main() {
 	router.HandleFunc("/fakultet/diplomaRequest", server.DiplomaRequest).Methods("POST")
 	router.HandleFunc("/fakultet/diplomaRequestsInPendingState", server.GetDiplomaRequestInPendingState).Methods("GET")
 	router.HandleFunc("/fakultet/decideDiplomaReques/{id}", server.DecideDiplomaRequest).Methods("POST")
-	router.HandleFunc("/fakultet/getDiplomaRequestsForUserIdNotInPendingState", server.GetDiplomaRequestsForUserIdNotInPendingState).Methods("GET")
+	router.HandleFunc("/fakultet/getDiplomaRequestsForUserId", server.GetDiplomaRequestsForUserId).Methods("GET")
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),

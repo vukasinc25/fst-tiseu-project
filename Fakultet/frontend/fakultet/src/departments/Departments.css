@@ -1,69 +1,69 @@
 .App1 {
     text-align: center;
-  }
-  
+}
+
+.departments-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  margin: auto;
+}
+
+.department-card {
+  background: #61cffb;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.department-name {
+  margin: 0 0 10px 0;
+  font-size: 1.5em;
+  border-bottom: 2px solid #000; /* Adds an underline */
+}
+
+.staff-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.staff-list-item {
+  background: #eee;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  padding: 5px;
+  text-align: left;
+}
+
+.department-card p {
+  margin: 5px 0;
+}
+
+.create-department-button {
+  background-color: #4CAF50; /* Green background */
+  border: none; /* Remove border */
+  color: white; /* White text */
+  padding: 15px 32px; /* Some padding */
+  text-align: center; /* Centered text */
+  text-decoration: none; /* Remove underline */
+  display: inline-block; /* Make the button an inline block */
+  font-size: 16px; /* Increase font size */
+  margin: 4px 2px; /* Some margin */
+  cursor: pointer; /* Pointer/hand icon */
+  transition-duration: 0.4s; /* 0.4 second transition effect */
+}
+
+@media (max-width: 768px) {
   .departments-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    width: 100%;
-    margin: auto;
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .department-card {
-    background: #61cffb;
-    padding: 20px;
-    border-radius: 5px;
-    text-align: left;
+}
+
+@media (max-width: 480px) {
+  .departments-grid {
+    grid-template-columns: 1fr;
   }
-  
-  .department-name {
-    margin: 0 0 10px 0;
-    font-size: 1.5em;
-    border-bottom: 2px solid #000; /* Adds an underline */
-  }
-  
-  .staff-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .staff-list-item {
-    background: #eee;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    padding: 5px;
-    text-align: left;
-  }
-  
-  .department-card p {
-    margin: 5px 0;
-  }
-  
-  .createCompetition {
-    background-color: #4CAF50; /* Green background */
-    border: none; /* Remove border */
-    color: white; /* White text */
-    padding: 15px 32px; /* Some padding */
-    text-align: center; /* Centered text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block; /* Make the button an inline block */
-    font-size: 16px; /* Increase font size */
-    margin: 4px 2px; /* Some margin */
-    cursor: pointer; /* Pointer/hand icon */
-    transition-duration: 0.4s; /* 0.4 second transition effect */
-  }
-  
-  @media (max-width: 768px) {
-    .competitions-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .competitions-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+}
   

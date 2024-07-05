@@ -401,7 +401,7 @@ func (nr *NewRepository) InsertDiploma(diploma *model.Diploma) error {
 	return nil
 }
 
-func (nr *NewRepository) GetDiplomaRequestsForUserIdNotInPendingState(userId string) (*model.DiplomaRequests, error) {
+func (nr *NewRepository) GetDiplomaRequestsForUserId(userId string) (*model.DiplomaRequests, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -412,7 +412,7 @@ func (nr *NewRepository) GetDiplomaRequestsForUserIdNotInPendingState(userId str
 	}
 
 	var diplomaRequests model.DiplomaRequests
-	filter := bson.M{"userId": userId, "inPending": false}
+	filter := bson.M{"userId": userId}
 	cursor, err := diplomaRequestsCollection.Find(ctx, filter)
 	if err != nil {
 		log.Println("Cant find diplomaRequestsCollection: ", err)
@@ -423,6 +423,30 @@ func (nr *NewRepository) GetDiplomaRequestsForUserIdNotInPendingState(userId str
 		return nil, err
 	}
 	return &diplomaRequests, nil
+}
+
+func (nr *NewRepository) GetDiplomaRequestById(id string) (*model.DiplomaRequest, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	diplomaRequestsCollection, err := nr.getCollection(9)
+	if err != nil {
+		log.Println("Duplicate key error: ", err)
+		return nil, err
+	}
+
+	var diplomaRequest model.DiplomaRequest
+
+	objId, _ := primitive.ObjectIDFromHex(id)
+
+	filter := bson.M{"_id": objId}
+	err = diplomaRequestsCollection.FindOne(ctx, filter).Decode(&diplomaRequest)
+	if err != nil {
+		log.Println("Cant find diplomaRequestsCollection: ", err)
+		return nil, err
+	}
+
+	return &diplomaRequest, nil
 }
 
 func (nr *NewRepository) UpdateDiplomaRequest(requestId string, isApproved bool) error {

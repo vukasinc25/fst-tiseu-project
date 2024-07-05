@@ -201,7 +201,9 @@ const CreateStudyProgram = () => {
                     </select>
                 </label>
                 <br/>
-                {!fetchError && <p>Failed to load departments. Please try again later.</p>}
+                <p>{fetchError}</p>
+                {/* {!fetchError && <p>Failed to load departments. Please try again later.</p>} */}
+                <p>{fetchError ? "Failed to load departments. Please try again later." : ""}</p>
                 <br/>
                 {hasRole("ADMIN") && <button type="submit" disabled={isFormEmpty()}>Create Study Program</button>}
             </form>

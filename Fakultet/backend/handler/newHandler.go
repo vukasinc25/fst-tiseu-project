@@ -8,8 +8,10 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"mime"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -72,8 +74,8 @@ func (nh *newHandler) GetDiplomaRequestInPendingState(w http.ResponseWriter, req
 	encodeToJson(w, diplomas)
 }
 
-func (nh *newHandler) GetDiplomaRequestsForUserIdNotInPendingState(w http.ResponseWriter, req *http.Request) {
-	log.Println("Usli u GetDiplomaRequestsForUserIdNotInPendingState")
+func (nh *newHandler) GetDiplomaRequestsForUserId(w http.ResponseWriter, req *http.Request) {
+	log.Println("Usli u GetDiplomaRequestsForUserId")
 	authPayload, ok := req.Context().Value("authorization_payload").(*token.Payload)
 	if !ok {
 		// Handle case where authorization_payload is not found in context
@@ -86,10 +88,10 @@ func (nh *newHandler) GetDiplomaRequestsForUserIdNotInPendingState(w http.Respon
 	userId = strings.Trim(userId, "\"")
 	log.Println("User Id: ", userId)
 
-	requests, err := nh.repo.GetDiplomaRequestsForUserIdNotInPendingState(userId)
+	requests, err := nh.repo.GetDiplomaRequestsForUserId(userId)
 	if err != nil {
 		log.Println("Cant get requests: ", err)
-		sendErrorWithMessage(w, "Cant get request", http.StatusInternalServerError)
+		sendErrorWithMessage(w, "Cant get requests", http.StatusInternalServerError)
 		return
 	}
 
@@ -114,11 +116,29 @@ func (nh *newHandler) DecideDiplomaRequest(w http.ResponseWriter, req *http.Requ
 	}
 
 	log.Println(isApproved.IsApproved)
+
 	err = nh.repo.UpdateDiplomaRequest(id, isApproved.IsApproved)
 	if err != nil {
 		log.Println("Cant update diploma request: ", err)
 		sendErrorWithMessage(w, "Cant update diploma request", http.StatusInternalServerError)
 		return
+	}
+
+	diplomaRequest, err := nh.repo.GetDiplomaRequestById(id)
+	if err != nil {
+		log.Print("Cant find diploma request by id: ", err)
+		sendErrorWithMessage(w, "Cant find diploma request by id", http.StatusInternalServerError)
+		return
+	}
+
+	// create diplome
+	if isApproved.IsApproved {
+		err = nh.CreateDiploma(diplomaRequest.UserId)
+		if err != nil {
+			log.Print("Cant create diploma: ", err)
+			sendErrorWithMessage(w, "Cant create diploma", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	sendErrorWithMessage(w, "Ok", http.StatusOK)
@@ -251,41 +271,27 @@ func (nh *newHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	sendErrorWithMessage(w, "User Created", http.StatusCreated)
 }
 
-func (nh *newHandler) CreateDiploma(w http.ResponseWriter, req *http.Request) {
+func (nh *newHandler) CreateDiploma(userId string) error {
 	log.Println("Usli u CreateDiploma")
 
-	contentType := req.Header.Get("Content-Type")
-	mediatype, _, err := mime.ParseMediaType(contentType)
+	// generate random number between 6 and 10
+	randomNumber := rand.Intn(5) + 6
+	log.Println("Rand number: ", randomNumber)
+
+	diploma := model.Diploma{
+		ID:           primitive.NewObjectID(),
+		UserId:       userId,
+		IssueDate:    time.Now(),
+		AverageGrade: strconv.Itoa(randomNumber),
+	}
+
+	err := nh.repo.InsertDiploma(&diploma)
 	if err != nil {
-		log.Println("Error cant mimi.ParseMediaType")
-		sendErrorWithMessage(w, err.Error(), http.StatusBadRequest)
-		return
+		log.Println("Cant create diploma in mongo: ", err)
+		return err
 	}
 
-	if mediatype != "application/json" {
-		err := errors.New("expect application/json Content-Type")
-		sendErrorWithMessage(w, err.Error(), http.StatusUnsupportedMediaType)
-		return
-	}
-
-	log.Println("Pre decodeBody")
-	rt, err := decodeDipomaBody(req.Body)
-	if err != nil {
-		log.Println("Decode: ", err)
-		sendErrorWithMessage(w, "Error when decoding data", http.StatusBadRequest)
-		return
-	}
-
-	rt.ID = primitive.NewObjectID()
-	rt.IssueDate = time.Now()
-
-	err = nh.repo.InsertDiploma(rt)
-	if err != nil {
-		sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	sendErrorWithMessage(w, "User diploma created", http.StatusCreated)
+	return nil
 }
 
 func (nh *newHandler) CreateCompetition(w http.ResponseWriter, req *http.Request) {

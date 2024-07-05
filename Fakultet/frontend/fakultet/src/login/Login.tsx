@@ -57,9 +57,8 @@ const Login = () => {
                 console.log('Access Token:', localStorage.getItem("accessToken"));
             }
 
-
             history.push("/competitions");
-
+            window.location.reload();
 
         } catch (error) {
             console.error('Error:', error);

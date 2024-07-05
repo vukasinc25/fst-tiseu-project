@@ -14,6 +14,9 @@ import StudyProgram from './studyProgram/StudyProgram';
 import Navbar from './navbar/Navbar';
 import CreateStudyProgram from './createStudyProgram/CreateStudyProgram';
 import ProtectedRoute from './role-base/Auth';
+import DiplomaRequest from './diplomaRequests/DiplomaRequests';
+import DiplomaRequests from './diplomaRequests/DiplomaRequests';
+import CreateDepartments from './createDepartments/CreateDepartments';
 function App() {
   
   return (
@@ -37,6 +40,8 @@ function App() {
             <ProtectedRoute exact path="/studyPrograms" component={StudyPrograms} roles={['ADMIN']} />
             <ProtectedRoute exact path="/studyProgram/:id" component={StudyProgram} roles={['ADMIN']} />
             <ProtectedRoute exact path="/studyProgram" component={CreateStudyProgram} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/diplomaRequests" component={DiplomaRequests} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/department" component={CreateDepartments} roles={['ADMIN']} />
             {/* <Route exact path="/competition">
               <CreateCompetition/>
             </Route>
