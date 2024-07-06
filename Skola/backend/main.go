@@ -22,25 +22,29 @@ func main() {
 	//timeoutContext, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	//defer cancel()
 
-	//newRepository, err := repository.New(timeoutContext)
-	//if err != nil {
-	//	log.Fatal(err)
-	//	return
-	//}
-	//defer newRepository.Disconnect(timeoutContext)
-	//
-	//newRepository.Ping()
-	//
-	//server, err := handler.NewHandler(newRepository)
-	//if err != nil {
-	//	log.Fatal(err)
-	//	return
-	//}
+	repository, err := NewRepository()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer repository.Disconnect()
 
+	err = repository.CreateData()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	server, err := NewHandler(repository)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	router.HandleFunc("/skola/diplomas", server.GetUserDiplomas).Methods("POST")
 	// router.Use(GlobalMiddleware)
 	//router.HandleFunc("/fakultet/create", server.CreateCompetition).Methods("POST")
 
-	srv := &http.Server{Addr: "0.0.0.0:8001", Handler: router}
+	srv := &http.Server{Addr: "0.0.0.0:8005", Handler: router}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {

@@ -37,7 +37,20 @@ services:
     networks:
       - network
 
-  #SLUZBA ZA ZAPOSLJAVANJE
+  skola:
+    image: skola
+    hostname: skola
+    build:
+      context: .
+      dockerfile: Skola/backend/Dockerfile
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - network
+
+    #SLUZBA ZA ZAPOSLJAVANJE
   profile-service:
     image: profile-service
     hostname: profile-service
@@ -115,9 +128,27 @@ services:
     networks:
       - network
 
+  mysql:
+    image: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: "skola"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - mysql_store:/var/lib/mysql
+    networks:
+      - network
+
 volumes:
   mongo_store:
   mongo_express_data:
+  mysql_store:
 
 networks:
   network:
