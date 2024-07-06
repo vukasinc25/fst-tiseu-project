@@ -76,6 +76,30 @@ func (uh *NewRepository) Ping() {
 	fmt.Println(databases)
 }
 
+func (nr *NewRepository) GetAllRegistrationsToCompetition(competitionId string) (*model.RegisteredStudentsToCommpetition, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	registerdStudentsCollection, err := nr.getCollection(2)
+	if err != nil {
+		log.Println("Error getting collection: ", err)
+		return nil, err
+	}
+
+	var registeredStudentsToCommpetition model.RegisteredStudentsToCommpetition
+
+	cursor, err := registerdStudentsCollection.Find(ctx, bson.M{"competitionID": competitionId})
+	if err != nil {
+		log.Println("Error decoding user document: ", err)
+		return nil, err
+	}
+	if err = cursor.All(ctx, &registeredStudentsToCommpetition); err != nil {
+		log.Println("Department Cursor.All: ", err)
+		return nil, err
+	}
+	return &registeredStudentsToCommpetition, nil
+}
+
 func (nr *NewRepository) GetAllCompetitions() (*model.Competitions, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -183,7 +207,7 @@ func (nr *NewRepository) GetAllStudyPrograms() (*model.StudyPrograms, error) {
 	return &studyPrograms, nil
 }
 
-func (nr *NewRepository) CreateRegisteredStudentToTheCommpetition(registeredStudentsToCommpetition *model.RegisteredStudentsToCommpetition) error {
+func (nr *NewRepository) CreateRegisteredStudentToTheCommpetition(registeredStudentToCommpetition *model.RegisteredStudentToCommpetition) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -193,7 +217,7 @@ func (nr *NewRepository) CreateRegisteredStudentToTheCommpetition(registeredStud
 		return err
 	}
 
-	result, err := registeredStudentsToCommpetitionCollection.InsertOne(ctx, registeredStudentsToCommpetition)
+	result, err := registeredStudentsToCommpetitionCollection.InsertOne(ctx, registeredStudentToCommpetition)
 	if err != nil {
 		log.Println(err)
 		return err

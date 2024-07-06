@@ -2,17 +2,20 @@ import "./Diploma.css"
 import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
 import { isParameter } from "typescript";
+import { useAuth0 } from "@auth0/auth0-react";
 const Diploma = () => {
     const [diploma, setDiploma] = useState<any>(null);
     const [diplomaRequests, setDiplomaRequests] = useState<any[]>([]);
     const [isAnyApproved, setIsAnyApproved] = useState<boolean>(false);
     const [inPending, setInPending] = useState<boolean>(false);
     const [isRequestSent, setIsRequestSent] = useState<boolean>(false);
+    const { loginWithRedirect, logout, user, isLoading } = useAuth0();
 
     useEffect(() => {
         const fetchDiploma = async () => {
+            const userId = user?.sub?.split('|')[1];
             try {
-                const data = await customFetch(`http://localhost:8001/fakultet/user/diplomaByUserId`);
+                const data = await customFetch(`http://localhost:8001/fakultet/user/diplomaByUserId/${userId}`);
                 setDiploma(data);
                 console.log("Data: ", data);
             } catch (error) {
@@ -21,8 +24,9 @@ const Diploma = () => {
         };
 
         const fetchUserDiplomaRequests = async () => {
+            const userId = user?.sub?.split('|')[1];
             try {
-                const data = await customFetch(`http://localhost:8001/fakultet/getDiplomaRequestsForUserId`);
+                const data = await customFetch(`http://localhost:8001/fakultet/getDiplomaRequestsForUserId/${userId}`);
                 setDiplomaRequests(data);
                 setIsAnyApproved(data.some((request: any) => request.IsApproved === true));
                 setInPending(data.some((request: any) => request.InPending === true));
@@ -44,8 +48,9 @@ const Diploma = () => {
     }, [isAnyApproved, inPending]);
 
     const sendDiplomaRequest = async () => {
+        const userId = user?.sub?.split('|')[1];
         try {
-            const response = await customFetch(`http://localhost:8001/fakultet/diplomaRequest`, {
+            const response = await customFetch(`http://localhost:8001/fakultet/diplomaRequest/${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

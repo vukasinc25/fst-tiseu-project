@@ -17,6 +17,7 @@ import ProtectedRoute from './role-base/Auth';
 import DiplomaRequest from './diplomaRequests/DiplomaRequests';
 import DiplomaRequests from './diplomaRequests/DiplomaRequests';
 import CreateDepartments from './createDepartments/CreateDepartments';
+import CompetitionRequests from './competitionRequests/CompetitionRequests';
 function App() {
   
   return (
@@ -25,10 +26,9 @@ function App() {
         <Navbar/>
         <div className="content">
           <Switch>
-            <Route exact path="/">
-              {/* <Home /> */}
-              <Login/>
-            </Route>
+            {/* <Route exact path="/"> */}
+              {/* <Login/> */}
+            {/* </Route> */}
             <ProtectedRoute exact path="/competition" component={CreateCompetition} roles={['ADMIN']} />
             <ProtectedRoute exact path="/competitions" component={Competitions} roles={['ADMIN']} />
             <ProtectedRoute exact path="/competition/:id" component={Competition} roles={['ADMIN']} />
@@ -42,6 +42,7 @@ function App() {
             <ProtectedRoute exact path="/studyProgram" component={CreateStudyProgram} roles={['ADMIN']} />
             <ProtectedRoute exact path="/diplomaRequests" component={DiplomaRequests} roles={['ADMIN']} />
             <ProtectedRoute exact path="/department" component={CreateDepartments} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/competitionRequests/:id" component={CompetitionRequests} roles={['ADMIN']} />
             {/* <Route exact path="/competition">
               <CreateCompetition/>
             </Route>

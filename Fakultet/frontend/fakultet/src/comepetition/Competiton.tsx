@@ -4,60 +4,66 @@ import { useHistory, useParams } from "react-router-dom";
 import customFetch from "../intersceptor/interceptor";
 import { RouteParams } from "../intefaces/routeParams";
 import useRoles from "../role-base/userValidation";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Competition: React.FC = () => {
-    const { id } = useParams<RouteParams>();
-    const [competition, setCompetition] = useState<any>(null);
-    const history = useHistory();
-    const { hasRole } = useRoles();
+  const { id } = useParams<RouteParams>();
+  const [competition, setCompetition] = useState<any>(null);
+  const history = useHistory();
+  const { hasRole } = useRoles();
+  const { loginWithRedirect, logout, user, isLoading } = useAuth0();
 
-    useEffect(() => {
-        fetchCompetitions();
-      }, []);
+  useEffect(() => {
+    fetchCompetitions();
+  }, []);
+
+  const fetchCompetitions = async () => {
+    try {
+      const data = await customFetch(`http://localhost:8001/fakultet/competition/${id}`);
+      setCompetition(data);
+      console.log("Data: ",data)
+    } catch (error) {
+      console.error('Failed to fetch competitions:', error);
+    }
+  };
+
+  function handleSubmit(e: { preventDefault: () => void; }) {
+    e.preventDefault();    
+
+    history.push(`/examResults/${competition._id}`);
+  }
+
+  function handleExamResul(e: { preventDefault: () => void; }) {
+    e.preventDefault();    
+
+    history.push({
+      pathname: '/examResult',
+      state: { competitionId: id },
+    });
+  }
     
-      const fetchCompetitions = async () => {
-        try {
-          const data = await customFetch(`http://localhost:8001/fakultet/competition/${id}`);
-          setCompetition(data);
-          console.log("Data: ",data)
-        } catch (error) {
-          console.error('Failed to fetch competitions:', error);
-        }
-      };
+  function handleRegister(e: { preventDefault: () => void; }) {
+    e.preventDefault();    
+    const userId = user?.sub?.split('|')[1];
+    try {
+      const data = customFetch(`http://localhost:8001/fakultet/user/registerToCompetition/${id}/${userId}`,{
+        method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(null),
+      });
+      setCompetition(data);
+      console.log("Data: ",data)
+      history.push('/competitions')
+    } catch (error) {
+      console.error('Failed to fetch competitions:', error);
+    }
+  }
 
-      function handleSubmit(e: { preventDefault: () => void; }) {
-        e.preventDefault();    
-
-        history.push(`/examResults/${competition._id}`);
-      }
-  
-      function handleExamResul(e: { preventDefault: () => void; }) {
-        e.preventDefault();    
-
-        history.push({
-          pathname: '/examResult',
-          state: { competitionId: id },
-        });
-      }
-      
-      function handleRegister(e: { preventDefault: () => void; }) {
-        e.preventDefault();    
-
-        try {
-          const data = customFetch(`http://localhost:8001/fakultet/user/registerToCompetition/${id}`,{
-            method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(null),
-          });
-          setCompetition(data);
-          console.log("Data: ",data)
-          history.push('/competitions')
-        } catch (error) {
-          console.error('Failed to fetch competitions:', error);
-        }
-      }
+  function handleCompetitonRequests(e: { preventDefault: () => void; }) {
+    history.push(`/competitionRequests/${id}`)
+  }
 
     return (
         <div className="competition-container">
@@ -115,6 +121,7 @@ const Competition: React.FC = () => {
         <div className="button">
           {hasRole("STUDENT") && <button className="results" onClick={handleRegister}>Register</button>}
           {hasRole("PROFESSOR") && <button className="results" onClick={handleExamResul}>Add Results</button>}
+          {hasRole("ADMIN") && <button className="results" onClick={handleCompetitonRequests}>Competition Requests</button>}
           <button onClick={handleSubmit}>Results</button>
         </div>
       </div>

@@ -19,10 +19,11 @@ type Competition struct {
 	ContactInformation    string             `bson:"contactInformation" json:"contactInformation"`
 }
 
-type RegisteredStudentsToCommpetition struct {
+type RegisteredStudentToCommpetition struct {
 	ID            primitive.ObjectID `bson:"_id" json:"_id"`
 	CompetitionID string             `bson:"competitionID" json:"competitionID"`
 	UserID        string             `bson:"userID" json:"userID"`
 }
 
 type Competitions []*Competition
+type RegisteredStudentsToCommpetition []*RegisteredStudentToCommpetition

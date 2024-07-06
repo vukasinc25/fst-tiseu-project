@@ -27,10 +27,10 @@ func main() {
 	timeoutContext, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	defer cancel()
 
-	tokenMaker, err := token.NewJWTMaker("12345678901234567890123456789012")
-	if err != nil {
-		log.Println("Ovde0: ", err)
-	}
+	// tokenMaker, err := token.NewJWTMaker("12345678901234567890123456789012")
+	// if err != nil {
+	// 	log.Println("Ovde0: ", err)
+	// }
 
 	newRepository, err := repository.New(timeoutContext)
 	if err != nil {
@@ -46,15 +46,16 @@ func main() {
 		return
 	}
 
-	globalMiddleware := GlobalMiddleware(tokenMaker)
-	router.Use(globalMiddleware)
+	// globalMiddleware := GlobalMiddleware(tokenMaker)
+	// router.Use(globalMiddleware)
 	router.HandleFunc("/fakultet/createCompetition", server.CreateCompetition).Methods("POST")
 	router.HandleFunc("/fakultet/competitions", server.GetAllCompetitions).Methods("GET")
 	router.HandleFunc("/fakultet/competition/{id}", server.GetCompetitionById).Methods("GET")
 	router.HandleFunc("/fakultet/user/create", server.CreateUser).Methods("POST")
 	// router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
-	router.HandleFunc("/fakultet/user/registerToCompetition/{id}", server.CreateRegistrationUserToCompetition).Methods("POST")
-	router.HandleFunc("/fakultet/user/diplomaByUserId", server.GetDiplomaByUserId).Methods("GET")
+	router.HandleFunc("/fakultet/user/getRegistrationsToCompetition/{id}", server.GetAllRegistrationsToCompetition).Methods("GET")
+	router.HandleFunc("/fakultet/user/registerToCompetition/{id}/{userId}", server.CreateRegistrationUserToCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/user/diplomaByUserId/{id}", server.GetDiplomaByUserId).Methods("GET") //ovde
 	router.HandleFunc("/fakultet/user/examResults", server.CreateUserExamResult).Methods("POST")
 	router.HandleFunc("/fakultet/user/getResultsByCompetitionId/{id}", server.GetAllExamResultsByCompetitionId).Methods("GET")
 	router.HandleFunc("/fakultet/department", server.CreateDepartment).Methods("POST")
@@ -62,10 +63,10 @@ func main() {
 	router.HandleFunc("/fakultet/studyProgram", server.CreateStudyProgram).Methods("POST")
 	router.HandleFunc("/fakultet/studyPrograms", server.GetAlltudyPrograms).Methods("GET")
 	router.HandleFunc("/fakultet/studyProgram/{id}", server.GetStudyProgramById).Methods("GET")
-	router.HandleFunc("/fakultet/diplomaRequest", server.DiplomaRequest).Methods("POST")
+	router.HandleFunc("/fakultet/diplomaRequest/{id}", server.DiplomaRequest).Methods("POST") //ovde
 	router.HandleFunc("/fakultet/diplomaRequestsInPendingState", server.GetDiplomaRequestInPendingState).Methods("GET")
 	router.HandleFunc("/fakultet/decideDiplomaReques/{id}", server.DecideDiplomaRequest).Methods("POST")
-	router.HandleFunc("/fakultet/getDiplomaRequestsForUserId", server.GetDiplomaRequestsForUserId).Methods("GET")
+	router.HandleFunc("/fakultet/getDiplomaRequestsForUserId/{id}", server.GetDiplomaRequestsForUserId).Methods("GET") //ovde
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),

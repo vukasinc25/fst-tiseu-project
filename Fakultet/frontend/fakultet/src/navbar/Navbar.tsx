@@ -26,12 +26,15 @@
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { useAuth0 } from "@auth0/auth0-react";
+import useRoles from "../role-base/userValidation";
 
 const Navbar = () => {
   const { loginWithRedirect, logout, user, isLoading } = useAuth0();
+  const { hasRole } = useRoles();
   if (!isLoading) {
-    console.log(user);
+    console.log("User: ",user);
   }
+
   return (
     <nav className="navbar">
       <ul className="nav-list">
@@ -41,9 +44,9 @@ const Navbar = () => {
           </li>
         </div>
         <div className="nav-group">
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link to="/">Login</Link>
-          </li>
+          </li> */}
           {/* {this.state.value == 'news'? <Text>data</Text>: null } */}
           {!isLoading && !user ? (
             <li className="nav-item">
@@ -72,7 +75,8 @@ const Navbar = () => {
           </li>
           <li className="nav-item">
             <Link to="/diploma">Diploma</Link>
-          </li>
+          </li>z
+          {user?.user_metadata?.roles.includes("ADMIN") && <li className="nav-item"><Link to="/diplomaRequests">Diploma Requests</Link></li>}
         </div>
       </ul>
     </nav>
