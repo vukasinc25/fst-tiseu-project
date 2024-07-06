@@ -1,6 +1,16 @@
 "use server";
 import { cookies } from "next/headers";
 
+export async function getDiplomasByUser(userId: any) {
+  const response = await fetch("/http://localhost8000/api/skola/diplomas", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userId),
+  });
+}
+
 export async function createCookie(data: string) {
   cookies().set("session", data, { sameSite: "none", secure: true });
 }
@@ -8,9 +18,7 @@ export async function createCookie(data: string) {
 export async function checkCookie() {
   const session = cookies().get("session")?.value;
 
-  if (session == undefined) {
-    return false;
-  } else return true;
+  return session != undefined;
 }
 
 export async function deleteCookie() {

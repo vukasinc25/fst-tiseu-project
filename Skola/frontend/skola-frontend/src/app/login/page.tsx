@@ -31,6 +31,9 @@ export default function Login() {
     const data = await response.json();
     console.log(data);
     await createCookie(data.access_token);
+
+    localStorage.setItem("jwt", data);
+
     router.push("/");
   }
 
