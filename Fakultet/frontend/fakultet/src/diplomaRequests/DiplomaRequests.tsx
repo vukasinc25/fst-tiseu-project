@@ -28,6 +28,7 @@ const DiplomaRequests = () => {
             });
             console.log('Diploma request sent successfully:', response);
             alert("Request Approved")
+            fetchDiplomaRequests();
         } catch (error) {
             console.error('Failed to send diploma request:', error);
         }
@@ -44,6 +45,7 @@ const DiplomaRequests = () => {
             });
             console.log('Diploma request sent successfully:', response);
             alert("Request Approved")
+            fetchDiplomaRequests();
         } catch (error) {
             console.error('Failed to send diploma request:', error);
         }

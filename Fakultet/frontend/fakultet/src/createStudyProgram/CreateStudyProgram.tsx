@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
 import "./CreateStudyProgram.css"
 import useRoles from "../role-base/userValidation";
+import { useAuth0 } from "@auth0/auth0-react";
 const CreateStudyProgram = () => {
+    const { loginWithRedirect, logout, user, isLoading } = useAuth0();
     const [formData, setFormData] = useState({
         name: "",
         studyLevel: "",
@@ -65,8 +67,10 @@ const CreateStudyProgram = () => {
             });
 
             clearForm();
+            alert("Study program created")
         } catch (error) {
             console.error('Failed to create study program:', error);
+            alert("Error when creating study program")
         }
     };
     
@@ -205,7 +209,7 @@ const CreateStudyProgram = () => {
                 {/* {!fetchError && <p>Failed to load departments. Please try again later.</p>} */}
                 <p>{fetchError ? "Failed to load departments. Please try again later." : ""}</p>
                 <br/>
-                {hasRole("ADMIN") && <button type="submit" disabled={isFormEmpty()}>Create Study Program</button>}
+                {user?.user_metadata?.roles.includes("ADMIN") && <button type="submit" disabled={isFormEmpty()}>Create Study Program</button>}
             </form>
         </div>
     );

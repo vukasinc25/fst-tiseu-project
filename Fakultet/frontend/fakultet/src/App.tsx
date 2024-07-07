@@ -30,15 +30,15 @@ function App() {
               {/* <Login/> */}
             {/* </Route> */}
             <ProtectedRoute exact path="/competition" component={CreateCompetition} roles={['ADMIN']} />
-            <ProtectedRoute exact path="/competitions" component={Competitions} roles={['ADMIN']} />
-            <ProtectedRoute exact path="/competition/:id" component={Competition} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/competitions" component={Competitions} roles={['ADMIN','STUDENT']} />
+            <ProtectedRoute exact path="/competition/:id" component={Competition} roles={['ADMIN','STUDENT']} />
             <ProtectedRoute exact path="/form" component={Form} roles={['ADMIN']} />
-            <ProtectedRoute exact path="/examResults/:id" component={ExamResults} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/examResults/:id" component={ExamResults} roles={['ADMIN','STUDENT']} />
             <ProtectedRoute exact path="/examResult" component={ExamResult} roles={['ADMIN']} />
-            <ProtectedRoute exact path="/diploma" component={Diploma} roles={['ADMIN']} />
-            <ProtectedRoute exact path="/departments" component={Departments} roles={['ADMIN']} />
-            <ProtectedRoute exact path="/studyPrograms" component={StudyPrograms} roles={['ADMIN']} />
-            <ProtectedRoute exact path="/studyProgram/:id" component={StudyProgram} roles={['ADMIN']} />
+            <ProtectedRoute exact path="/diploma" component={Diploma} roles={['ADMIN','STUDENT']} />
+            <ProtectedRoute exact path="/departments" component={Departments} roles={['ADMIN','STUDENT']} />
+            <ProtectedRoute exact path="/studyPrograms" component={StudyPrograms} roles={['ADMIN','STUDENT']} />
+            <ProtectedRoute exact path="/studyProgram/:id" component={StudyProgram} roles={['ADMIN','STUDENT']} />
             <ProtectedRoute exact path="/studyProgram" component={CreateStudyProgram} roles={['ADMIN']} />
             <ProtectedRoute exact path="/diplomaRequests" component={DiplomaRequests} roles={['ADMIN']} />
             <ProtectedRoute exact path="/department" component={CreateDepartments} roles={['ADMIN']} />

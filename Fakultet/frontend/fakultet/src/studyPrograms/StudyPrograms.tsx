@@ -2,9 +2,11 @@ import { Link, useHistory } from "react-router-dom";
 import "./StudyPrograms.css"
 import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
+import useRoles from "../role-base/userValidation";
 const StudyPrograms = () => {
     const [studyPrograms, setStudyPrograms] = useState([]);
     const history = useHistory();
+    const {hasRole} = useRoles();
 
     useEffect(() => {
         fetchCompetitions();
@@ -28,9 +30,9 @@ const StudyPrograms = () => {
     return (  
     <div className="App1">
       <h1>Study Programs</h1>
-      <div className="button-container">
+      {hasRole("ADMIN") && <div className="button-container">
         <button className="createStudyProgram" onClick={handleSubmit}>Create Study Program</button>
-      </div>
+      </div>}
       <div className="study-programs-grid">
         {studyPrograms?.map((studyProgram: any) => (
            <div key={studyProgram._id} className="study-program-card">

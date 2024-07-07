@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 const ErrorPage = () => {
     return (
         <div className="errorPage">
-            <h1>Glabaj ga majmune</h1>
-            <Link to="/">Nazad</Link>
+            <h1>Stranica ne postoji</h1>
+            <Link to="/competitions">Nazad</Link>
         </div>
     );
 }

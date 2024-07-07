@@ -73,9 +73,9 @@ const Navbar = () => {
           <li className="nav-item">
             <Link to="/departments">Departments</Link>
           </li>
-          <li className="nav-item">
+          {user?.user_metadata?.roles.includes("STUDENT") && <li className="nav-item">
             <Link to="/diploma">Diploma</Link>
-          </li>z
+          </li>}
           {user?.user_metadata?.roles.includes("ADMIN") && <li className="nav-item"><Link to="/diplomaRequests">Diploma Requests</Link></li>}
         </div>
       </ul>

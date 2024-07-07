@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import './Competitions.css';
 import customFetch from "../intersceptor/interceptor";
 import { Link, useHistory } from "react-router-dom";
+import useRoles from "../role-base/userValidation";
 
 const Competitions = () => {
   const [competitions, setCompetitions] = useState([]);
   const history = useHistory();
+  const {hasRole} = useRoles();
   // const [formData, setFormData] = useState({
   //   programName: '',
   //   admissionRequirements: '',
@@ -69,9 +71,9 @@ const Competitions = () => {
   return (
     <div className="App1">
       <h2>Competitions List</h2>
-      <div className="button-container">
+      {hasRole("ADMIN") && <div className="button-container">
         <button className="createCompetition" onClick={handleSubmit}>Create Competition</button>
-      </div>
+      </div>}
       <div className="competitions-grid">
         {competitions.map((competition: any) => (
           <div key={competition._id} className="competition-card">

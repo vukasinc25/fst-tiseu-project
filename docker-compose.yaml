@@ -44,6 +44,8 @@ services:
       context: .
       dockerfile: Skola/backend/Dockerfile
     restart: always
+    ports:
+      - "8002:8002"
     depends_on:
       mysql:
         condition: service_healthy

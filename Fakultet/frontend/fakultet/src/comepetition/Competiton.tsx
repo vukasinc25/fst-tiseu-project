@@ -55,6 +55,7 @@ const Competition: React.FC = () => {
       });
       setCompetition(data);
       console.log("Data: ",data)
+      alert("Registerd")
       history.push('/competitions')
     } catch (error) {
       console.error('Failed to fetch competitions:', error);

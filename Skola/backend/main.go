@@ -40,11 +40,10 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-	router.HandleFunc("/skola/diplomas", server.GetUserDiplomas).Methods("POST")
-	// router.Use(GlobalMiddleware)
-	//router.HandleFunc("/fakultet/create", server.CreateCompetition).Methods("POST")
 
-	srv := &http.Server{Addr: "0.0.0.0:8005", Handler: router}
+	router.HandleFunc("/skola/diplomas", server.GetUserDiplomas).Methods("POST")
+
+	srv := &http.Server{Addr: "0.0.0.0:8002", Handler: router}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {
