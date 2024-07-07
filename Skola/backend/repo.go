@@ -31,24 +31,37 @@ func (rp *Repo) Disconnect() error {
 }
 
 // select d.id from Users u, Students s, Diplomas d where u.id = s.userId and s.id = d.studentId;
-func (rp *Repo) GetDiplomaByStudent(userid string) error {
-	rows, err := rp.db.Query("select d.id from Users u, Students s, Diplomas d where u.id = s.userId and s.id = d.studentId and u.id = ?", userid)
+func (rp *Repo) GetDiplomaByStudent(userid string) ([]Diploma, error) {
+	rows, err := rp.db.Query("select d.id from Users u, Students s, Diplomas d "+
+		"where u.id = s.userId and s.id = d.studentId and u.id = ?;", userid)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer rows.Close()
 
-	var diplomas []int
+	var ids []int
 	for rows.Next() {
 		var diplomaId int
 		err := rows.Scan(&diplomaId)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		diplomas = append(diplomas, diplomaId)
+		ids = append(ids, diplomaId)
 	}
-	log.Println(diplomas)
-	return nil
+	//log.Println(diplomas)
+
+	rows, err = rp.db.Query("select d.averageGrade, s.TotalHighPoints, d.yearFinished from Diplomas d, Students s where d.studentId = s.id;")
+
+	var diplomas []Diploma
+	for rows.Next() {
+		var diploma Diploma
+		err := rows.Scan(&diploma.AverageGrade, &diploma.TotalHighPoints, &diploma.YearFinished)
+		if err != nil {
+			return nil, err
+		}
+		diplomas = append(diplomas, diploma)
+	}
+	return diplomas, nil
 }
 
 func (rp *Repo) CreateData() error {
@@ -157,14 +170,14 @@ func (rp *Repo) CreateData() error {
 	if len(users) == 0 {
 		_, err := rp.db.Exec("INSERT INTO Users"+
 			"(id, firstName, lastName, jmbg) VALUES (?, ?, ?, ?)"+
-			"", "667e16b89018c17af7f16031", "Pera", "Peric", " ")
+			"", "113289113681502612644", "Pera", "Peric", " ")
 		if err != nil {
 			return err
 		}
 
 		_, err = rp.db.Exec("INSERT INTO Students"+
 			"(currentSchoolYear, TotalHighPoints, userId) VALUES (?, ?, ?)"+
-			"", 2, 0, "667e16b89018c17af7f16031")
+			"", 2, 43.20, "113289113681502612644")
 		if err != nil {
 			return err
 		}
@@ -199,14 +212,14 @@ func (rp *Repo) CreateData() error {
 
 		_, err = rp.db.Exec("INSERT INTO Diplomas"+
 			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
-			"", 0, 2021, 1)
+			"", 4.30, 2021, 1)
 		if err != nil {
 			return err
 		}
 
 		_, err = rp.db.Exec("INSERT INTO Diplomas"+
 			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
-			"", 0, 2022, 1)
+			"", 4.55, 2022, 1)
 		if err != nil {
 			return err
 		}

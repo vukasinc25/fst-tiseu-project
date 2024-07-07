@@ -2,26 +2,45 @@
 import { redirect } from "next/navigation";
 import { checkCookie, deleteCookie, getDiplomasByUser } from "./components/api";
 import NavBar from "./header/page";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
-  const router = useRouter();
-  if (isLoading)
-    return <div className="mx-auto text-center fs-3 loading ">Loading...</div>;
+
+  // const router = useRouter();
+  // if (isLoading)
+  //   return <div className="mx-auto text-center fs-3 loading ">Loading...</div>;
   // if (user == undefined) {
   //   router.push("/api/auth/login");
   // }
 
   // console.log(user?.user_metadata);
-  console.log(user);
-  const userId = user?.user_metadata;
-  // getDiplomasByUser(userId);
+  useEffect(
+    function () {
+      if (!isLoading && user) {
+        console.log(user);
+        const userId = user?.sub?.slice(14);
+        console.log(userId);
+
+        fetch("http://localhost:8002/skola/diplomas", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data));
+      }
+    },
+    [user]
+  );
+
   // const isLoggedIn = await checkCookie();
-  // if (!isLoggedIn) {
-  //   redirect("/login");
-  // }
 
   return (
     <div>
