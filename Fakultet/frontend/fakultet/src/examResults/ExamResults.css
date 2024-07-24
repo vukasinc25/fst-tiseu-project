@@ -34,3 +34,7 @@
 .exam-results-table tbody tr:hover {
   background-color: #e0e0e0;
 }
+
+.red-line {
+  border-top: 2px solid red;
+}

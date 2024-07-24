@@ -16,37 +16,41 @@ const ExamResults: React.FC = () => {
         try {
           console.log("Id: ", id)
           const data = await customFetch(`http://localhost:8001/fakultet/user/getResultsByCompetitionId/${id}`);
-          setExamResults(data);
+          var sorted = data.sort((a:any,b:any) => a.score < b.score);
+          setExamResults(sorted);
           console.log("Data: ",data)
         } catch (error) {
           console.error('Failed to fetch competitions:', error);
         }
       };
-    return ( 
-      <div className="exam-results-container">
-        <h2>Exam Results</h2>
-        {examResults && (
-        <table className="exam-results-table">
-        <thead>
-          <tr>
-            <th>User Name</th>
-            <th>Score</th>
-            <th>Score Entry Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {examResults.map((result: any) => (
-            <tr key={result._id}>
-              <td>{result.userName}</td>
-              <td>{result.score}</td>
-              <td>{new Date(result.scoreEntryDate).toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-        )}
-    </div>
-    );
+      return (
+        <div className="exam-results-container">
+          <h2>Exam Results</h2>
+          <p>Students after the red line did not make the cut</p>
+          {examResults && (
+            <table className="exam-results-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>User Name</th>
+                  <th>Score</th>
+                  <th>Score Entry Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {examResults.map((result: any, index: number) => (
+                  <tr key={result._id} className={index === 5 ? "red-line" : ""}>
+                    <td>{index+1+"."}</td>
+                    <td>{result.userName}</td>
+                    <td>{result.score}</td>
+                    <td>{new Date(result.scoreEntryDate).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      );
 }
  
 export default ExamResults;

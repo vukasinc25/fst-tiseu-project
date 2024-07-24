@@ -66,11 +66,17 @@ const Competition: React.FC = () => {
     history.push(`/competitionRequests/${id}`)
   }
 
-    return (
-        <div className="competition-container">
-          <h1>Competition Details</h1>
-          {competition && (
-      <div className="competition-details">
+  const isDeadlinePassed = (deadline: string) => {
+    const today = new Date();
+    const deadlineDate = new Date(deadline);
+    return deadlineDate < today;
+  };
+
+  return (
+    <div className="competition-container">
+      <h1>Competition Details</h1>
+      {competition && (
+        <div className="competition-details">
         <div className="detail">
           <strong>Competition ID:</strong>
           <span>{id}</span>
@@ -119,16 +125,17 @@ const Competition: React.FC = () => {
           <strong>Contact Information:</strong>
           <span>{competition.contactInformation}</span>
         </div>
+        {isDeadlinePassed(competition.applicationDeadlines) && <p className="message">Applications are no longer possible because the deadline has passed</p>}
         <div className="button">
-          {hasRole("STUDENT") && <button className="results" onClick={handleRegister}>Register</button>}
+          {hasRole("STUDENT") && !isDeadlinePassed(competition.applicationDeadlines) && <button className="results" onClick={handleRegister}>Register</button>}
           {hasRole("PROFESSOR") && <button className="results" onClick={handleExamResul}>Add Results</button>}
           {hasRole("ADMIN") && <button className="results" onClick={handleCompetitonRequests}>Competition Requests</button>}
           <button onClick={handleSubmit}>Results</button>
         </div>
       </div>
-    )}
-      </div>
-    );
+      )}
+    </div>
+  );
   };
  
 export default Competition;
