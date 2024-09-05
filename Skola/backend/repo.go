@@ -2,8 +2,9 @@ package main
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Repo struct {
@@ -170,7 +171,14 @@ func (rp *Repo) CreateData() error {
 	if len(users) == 0 {
 		_, err := rp.db.Exec("INSERT INTO Users"+
 			"(id, firstName, lastName, jmbg) VALUES (?, ?, ?, ?)"+
-			"", "113289113681502612644", "Pera", "Peric", " ")
+			"", "100836532062458077463", "Marko", "Crncevic", " ")
+		if err != nil {
+			return err
+		}
+
+		_, err = rp.db.Exec("INSERT INTO Students"+
+			"(currentSchoolYear, TotalHighPoints, userId) VALUES (?, ?, ?)"+
+			"", 4, 44.20, "100836532062458077463")
 		if err != nil {
 			return err
 		}
@@ -181,7 +189,6 @@ func (rp *Repo) CreateData() error {
 		if err != nil {
 			return err
 		}
-
 		_, err = rp.db.Exec("INSERT INTO Subjects"+
 			"(name) VALUES (?)"+
 			"", "Srpski")
@@ -210,19 +217,21 @@ func (rp *Repo) CreateData() error {
 			return err
 		}
 
+		// Ovo se nije nesto kako treba kreiralo pazi sl put kada neko novi pokusa da pokrene kontejner, moras da kreiras rucno
+
 		_, err = rp.db.Exec("INSERT INTO Diplomas"+
 			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
-			"", 4.30, 2021, 1)
+			"", 4.40, 2021, 1)
 		if err != nil {
 			return err
 		}
 
-		_, err = rp.db.Exec("INSERT INTO Diplomas"+
-			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
-			"", 4.55, 2022, 1)
-		if err != nil {
-			return err
-		}
+		// _, err = rp.db.Exec("INSERT INTO Diplomas"+
+		// 	"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
+		// 	"", 4.55, 2022, 1)
+		// if err != nil {
+		// 	return err
+		// }
 
 		_, err = rp.db.Exec("INSERT INTO HasSubjects"+
 			"(diplomaId, subjectId, grades, finalGrade) VALUES (?, ?, ?, ?)"+

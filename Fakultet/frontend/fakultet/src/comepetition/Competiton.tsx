@@ -42,26 +42,29 @@ const Competition: React.FC = () => {
     });
   }
     
-  function handleRegister(e: { preventDefault: () => void; }) {
-    e.preventDefault();    
+  async function handleRegister(e: { preventDefault: () => void; }) {
+    e.preventDefault();
     const userId = user?.sub?.split('|')[1];
-    const userName = user?.name
+    const userName = user?.name;
+
     try {
-      const data = customFetch(`http://localhost:8001/fakultet/user/registerToCompetition/${id}/${userId}/${userName}`,{
-        method: 'POST',
+        // Await the result of the customFetch function to get the response
+        const _ = await customFetch(`http://localhost:8001/fakultet/user/registerToCompetition/${id}/${userId}/${userName}`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(null),
-      });
-      setCompetition(data);
-      console.log("Data: ",data)
-      alert("Registerd")
-      history.push('/competitions')
-    } catch (error) {
-      console.error('Failed to fetch competitions:', error);
+            body: JSON.stringify(null),  // Use null as the body
+        });
+
+        alert("Registered successfully");
+        history.push('/competitions');
+    } catch (error: any) {
+        console.error('Failed to register to competition:', error);
+        alert("An error occurred while registering for the competitio: " + error.message);
     }
-  }
+}
+
 
   function handleCompetitonRequests(e: { preventDefault: () => void; }) {
     history.push(`/competitionRequests/${id}`)

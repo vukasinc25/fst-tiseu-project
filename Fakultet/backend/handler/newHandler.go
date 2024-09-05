@@ -428,28 +428,7 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 	// req.Header.Set("Authorization", "Bearer "+token)
 
 	// // send request to the high school service(high school service not created still)
-	// url := "http://auth-service:8000/users/auth"
-	// req, err := http.NewRequest("POST", url, nil)
-	// if err != nil {
-	// 	fmt.Println("Error creating request:", err)
-	// 	return
-	// }
 
-	// client := &http.Client{}
-	// resp, err := client.Do(req)
-	// if err != nil {
-	// 	fmt.Println("Error sending request:", err)
-	// 	return
-	// }
-	// defer resp.Body.Close()
-
-	// body, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	fmt.Println("Error reading response body:", err)
-	// 	return
-	// }
-
-	// log.Println("Body: ", string(body))
 	vars := mux.Vars(req)
 
 	competitionId := vars["id"]
@@ -460,6 +439,55 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 	userId = strings.Trim(userId, "\"")
 	userName = strings.Trim(userName, "\"")
 	log.Println("CompetitionId: ", competitionId)
+
+	url := "http://skola:8002/skola/diplomas"
+
+	requestBody := map[string]string{
+		"userId": userId, // Replace with the actual userId
+	}
+
+	jsonData, err := json.Marshal(requestBody)
+	if err != nil {
+		log.Println("Error marshalling JSON:", err)
+		return
+	}
+
+	req, err = http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Println("Error creating request:", err)
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error sending request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp == nil {
+		sendErrorWithMessage(w, "User cant registerd to the competition", http.StatusBadRequest)
+		return
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error reading response body:", err)
+		return
+	}
+
+	log.Println("Response:", string(body))
+	log.Println("UserName:", userName)
+
+	if body == nil {
+		sendErrorWithMessage(w, "User cant registerd to the competition", http.StatusBadRequest)
+		return
+	}
+
+	// log.Println("Body: ", string(body))
 
 	// authPayload, ok := req.Context().Value("authorization_payload").(*token.Payload)
 	// if !ok {
@@ -472,6 +500,7 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 	// userId := authPayload.ID.Hex()
 	// userId = strings.Trim(userId, "\"")
 
+	/////// OVDE
 	userRegistration := model.RegisteredStudentToCommpetition{
 		CompetitionID: competitionId,
 		UserID:        userId,
@@ -480,7 +509,7 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 
 	userRegistration.ID = primitive.NewObjectID()
 
-	err := nh.repo.CreateRegisteredStudentToTheCommpetition(&userRegistration)
+	err = nh.repo.CreateRegisteredStudentToTheCommpetition(&userRegistration)
 	if err != nil {
 		log.Println(err)
 		sendErrorWithMessage(w, err.Error(), http.StatusInternalServerError)
