@@ -54,7 +54,7 @@ func main() {
 	router.HandleFunc("/fakultet/user/create", server.CreateUser).Methods("POST")
 	// router.HandleFunc("/fakultet/user/registerToCompetition", server.CreateRegistrationUserToCompetition).Methods("POST")
 	router.HandleFunc("/fakultet/user/getRegistrationsToCompetition/{id}", server.GetAllRegistrationsToCompetition).Methods("GET")
-	router.HandleFunc("/fakultet/user/registerToCompetition/{id}/{userId}", server.CreateRegistrationUserToCompetition).Methods("POST")
+	router.HandleFunc("/fakultet/user/registerToCompetition/{id}/{userId}/{userName}", server.CreateRegistrationUserToCompetition).Methods("POST")
 	router.HandleFunc("/fakultet/user/diplomaByUserId/{id}", server.GetDiplomaByUserId).Methods("GET") //ovde
 	router.HandleFunc("/fakultet/user/examResults", server.CreateUserExamResult).Methods("POST")
 	router.HandleFunc("/fakultet/user/getResultsByCompetitionId/{id}", server.GetAllExamResultsByCompetitionId).Methods("GET")
@@ -63,7 +63,7 @@ func main() {
 	router.HandleFunc("/fakultet/studyProgram", server.CreateStudyProgram).Methods("POST")
 	router.HandleFunc("/fakultet/studyPrograms", server.GetAlltudyPrograms).Methods("GET")
 	router.HandleFunc("/fakultet/studyProgram/{id}", server.GetStudyProgramById).Methods("GET")
-	router.HandleFunc("/fakultet/diplomaRequest/{id}", server.DiplomaRequest).Methods("POST") //ovde
+	router.HandleFunc("/fakultet/diplomaRequest/{id}/{name}", server.DiplomaRequest).Methods("POST") //ovde
 	router.HandleFunc("/fakultet/diplomaRequestsInPendingState", server.GetDiplomaRequestInPendingState).Methods("GET")
 	router.HandleFunc("/fakultet/decideDiplomaReques/{id}", server.DecideDiplomaRequest).Methods("POST")
 	router.HandleFunc("/fakultet/getDiplomaRequestsForUserId/{id}", server.GetDiplomaRequestsForUserId).Methods("GET") //ovde

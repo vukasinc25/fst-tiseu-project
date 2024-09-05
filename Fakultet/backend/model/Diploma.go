@@ -9,6 +9,7 @@ import (
 type Diploma struct {
 	ID           primitive.ObjectID `bson:"_id" json:"_id"`
 	UserId       string             `bson:"userId" json:"userId"`
+	UserName     string             `bson:"userName" json:"userName"`
 	IssueDate    time.Time          `bson:"issueDate" json:"issueDate"`
 	AverageGrade string             `bson:"averageGrade" json:"averageGrade"`
 }
@@ -16,6 +17,7 @@ type Diploma struct {
 type DiplomaRequest struct {
 	ID         primitive.ObjectID `bson:"_id" json:"_id"`
 	UserId     string             `bson:"userId" json:"userId"`
+	UserName   string             `bson:"userName" json:"userName"`
 	IssueDate  time.Time          `bson:"issueDate" json:"issueDate"`
 	InPending  bool               `bson:"inPending"`
 	IsApproved bool               `bson:"isApproved"`

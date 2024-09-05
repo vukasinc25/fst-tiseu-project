@@ -45,8 +45,9 @@ const Competition: React.FC = () => {
   function handleRegister(e: { preventDefault: () => void; }) {
     e.preventDefault();    
     const userId = user?.sub?.split('|')[1];
+    const userName = user?.name
     try {
-      const data = customFetch(`http://localhost:8001/fakultet/user/registerToCompetition/${id}/${userId}`,{
+      const data = customFetch(`http://localhost:8001/fakultet/user/registerToCompetition/${id}/${userId}/${userName}`,{
         method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

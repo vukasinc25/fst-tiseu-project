@@ -190,7 +190,7 @@ const CreateStudyProgram = () => {
                     />
                 </label>
                 <label>
-                    Department ID:
+                    Department:
                     <select
                         name="departmentID"
                         value={formData.departmentID}

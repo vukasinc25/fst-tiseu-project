@@ -72,14 +72,18 @@ func (nh *newHandler) DiplomaRequest(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
 	id := vars["id"]
+	name := vars["name"]
 
 	id = strings.Trim(id, "\"")
+	name = strings.Trim(name, "\"")
 
 	log.Println("User Id: ", id)
+	log.Println("User Name: ", name)
 
 	diplomaRequest := model.DiplomaRequest{
 		ID:         primitive.NewObjectID(),
 		UserId:     id,
+		UserName:   name,
 		IssueDate:  time.Now(),
 		InPending:  true,
 		IsApproved: false,
@@ -171,7 +175,7 @@ func (nh *newHandler) DecideDiplomaRequest(w http.ResponseWriter, req *http.Requ
 
 	// create diplome
 	if isApproved.IsApproved {
-		err = nh.CreateDiploma(diplomaRequest.UserId)
+		err = nh.CreateDiploma(diplomaRequest.UserId, diplomaRequest.UserName)
 		if err != nil {
 			log.Print("Cant create diploma: ", err)
 			sendErrorWithMessage(w, "Cant create diploma", http.StatusInternalServerError)
@@ -309,7 +313,7 @@ func (nh *newHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	sendErrorWithMessage(w, "User Created", http.StatusCreated)
 }
 
-func (nh *newHandler) CreateDiploma(userId string) error {
+func (nh *newHandler) CreateDiploma(userId string, userName string) error {
 	log.Println("Usli u CreateDiploma")
 
 	// generate random number between 6 and 10
@@ -319,6 +323,7 @@ func (nh *newHandler) CreateDiploma(userId string) error {
 	diploma := model.Diploma{
 		ID:           primitive.NewObjectID(),
 		UserId:       userId,
+		UserName:     userName,
 		IssueDate:    time.Now(),
 		AverageGrade: strconv.Itoa(randomNumber),
 	}
@@ -449,9 +454,11 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 
 	competitionId := vars["id"]
 	userId := vars["userId"]
+	userName := vars["userName"]
 
 	competitionId = strings.Trim(competitionId, "\"")
 	userId = strings.Trim(userId, "\"")
+	userName = strings.Trim(userName, "\"")
 	log.Println("CompetitionId: ", competitionId)
 
 	// authPayload, ok := req.Context().Value("authorization_payload").(*token.Payload)
@@ -468,6 +475,7 @@ func (nh *newHandler) CreateRegistrationUserToCompetition(w http.ResponseWriter,
 	userRegistration := model.RegisteredStudentToCommpetition{
 		CompetitionID: competitionId,
 		UserID:        userId,
+		UserName:      userName,
 	}
 
 	userRegistration.ID = primitive.NewObjectID()

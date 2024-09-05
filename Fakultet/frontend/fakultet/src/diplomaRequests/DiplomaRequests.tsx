@@ -57,6 +57,7 @@ const DiplomaRequests = () => {
         <table>
           <thead>
             <tr>
+              <th>Student ID</th>
               <th>Student Name</th>
               <th>Request Date</th>
               <th></th>
@@ -67,6 +68,7 @@ const DiplomaRequests = () => {
             {diplomaRequests?.map((request: any) => (
               <tr key={request._id}>
                 <td>{request.userId}</td>
+                <td>{request.userName}</td>
                 <td>{request.issueDate}</td>
                 <td><button className="approve-btn" onClick={() => handleApprove(request._id)}>Approve</button></td>
                 <td><button className="decline-btn" onClick={() => handleDecline(request._id)}>Decline</button></td>

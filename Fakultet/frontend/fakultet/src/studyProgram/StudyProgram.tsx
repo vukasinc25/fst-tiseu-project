@@ -6,9 +6,12 @@ import { RouteParams } from "../intefaces/routeParams";
 const StudyProgram = () => {
     const { id } = useParams<RouteParams>();
     const [studyProgram, setStudyProgram] = useState<any>(null);
+    const [departments, setDepartments] = useState([]);
+    const [fetchError, setFetchError] = useState(false);
 
     useEffect(() => {
         fetchCompetitions();
+        fetchDepartments();
     }, []);
     
     const fetchCompetitions = async () => {
@@ -19,6 +22,28 @@ const StudyProgram = () => {
         } catch (error) {
           console.error('Failed to fetch competitions:', error);
         }
+    };
+
+    const fetchDepartments = async () => {
+      try {
+          const data = await customFetch('http://localhost:8001/fakultet/departments');
+          setDepartments(data);
+          console.log("Departments: ",data)
+          setFetchError(false)
+      } catch (error) {
+          console.error('Failed to fetch departments:', error);
+          setFetchError(true)
+      }
+    };
+
+    const getDepartmentName = () => {
+      if (studyProgram && departments.length > 0) {
+        const department: any = departments.find(
+          (dept: any) => dept._id === studyProgram.departmentID
+        );
+        return department ? department.name : "Department not found";
+      }
+      return "Loading departments...";
     };
 
     return (  
@@ -73,6 +98,10 @@ const StudyProgram = () => {
           <div className="detail">
             <strong>Department ID:</strong>
             <span>{studyProgram.departmentID}</span>
+          </div>
+          <div className="detail">
+            <strong>Department Name:</strong>
+            <span>{getDepartmentName()}</span>
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import customFetch from "../intersceptor/interceptor";
 import { isParameter } from "typescript";
 import { useAuth0 } from "@auth0/auth0-react";
+import {jsPDF} from 'jspdf'
 const Diploma = () => {
     const [diploma, setDiploma] = useState<any>(null);
     const [diplomaRequests, setDiplomaRequests] = useState<any[]>([]);
@@ -49,8 +50,10 @@ const Diploma = () => {
 
     const sendDiplomaRequest = async () => {
         const userId = user?.sub?.split('|')[1];
+        const userName = user?.name;
+        console.log("User: ", user)
         try {
-            const response = await customFetch(`http://localhost:8001/fakultet/diplomaRequest/${userId}`, {
+            const response = await customFetch(`http://localhost:8001/fakultet/diplomaRequest/${userId}/${userName}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,6 +69,25 @@ const Diploma = () => {
         }
     };
 
+    const handleGeneratePDF = () => {
+        if (diploma) {
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text("Diploma Details", 20, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`User ID: ${diploma.userId}`, 20, 40);
+            doc.text(`User Name: ${diploma.userName}`, 20, 50);
+            doc.text(`Issue Date: ${new Date(diploma.issueDate).toLocaleDateString()}`, 20, 60);
+            doc.text(`Average Grade: ${diploma.averageGrade}`, 20, 70);
+            
+            // Save the PDF
+            doc.save(`Diploma_${diploma.userName}.pdf`);
+        } else {
+            alert("Diploma data is not available.");
+        }
+    };
+
     return (
         <div>
             {(inPending || isAnyApproved || isRequestSent) ? null : (
@@ -75,11 +97,13 @@ const Diploma = () => {
             </div>)}
             {diploma && (<div className="diploma-details">
                 <h2>Diploma Details</h2>
-                    <div>
-                        <p><strong>User ID:</strong> {diploma.userId}</p>
-                        <p><strong>Issue Date:</strong> {new Date(diploma.issueDate).toLocaleDateString()}</p>
-                        <p><strong>Average Grade:</strong> {diploma.averageGrade}</p>
-                    </div>
+                <div>
+                    <p><strong>User ID:</strong> {diploma.userId}</p>
+                    <p><strong>User Name:</strong> {diploma.userName}</p>
+                    <p><strong>Issue Date:</strong> {new Date(diploma.issueDate).toLocaleDateString()}</p>
+                    <p><strong>Average Grade:</strong> {diploma.averageGrade}</p>
+                </div>
+                <button onClick={handleGeneratePDF}>Generate PDF</button>
             </div>)}
         </div>
     );

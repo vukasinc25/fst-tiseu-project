@@ -27,7 +27,8 @@ const CompetitionRequests = () => {
             <ul className="requests-list">
                 {requests?.map((request: any) => (
                 <li key={request._id} className="request-item">
-                    <p>UserId: {request.userID}</p>
+                    <p>User Id: {request.userID}</p>
+                    <p>User Name: {request.userName}</p>
                 </li>
                 ))}
             </ul>

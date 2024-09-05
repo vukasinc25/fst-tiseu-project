@@ -23,6 +23,7 @@ type RegisteredStudentToCommpetition struct {
 	ID            primitive.ObjectID `bson:"_id" json:"_id"`
 	CompetitionID string             `bson:"competitionID" json:"competitionID"`
 	UserID        string             `bson:"userID" json:"userID"`
+	UserName      string             `bson:"userName" json:"userName"`
 }
 
 type Competitions []*Competition
