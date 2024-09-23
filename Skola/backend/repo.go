@@ -2,8 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"strconv"
+	"strings"
 )
 
 type Repo struct {
@@ -48,9 +51,15 @@ func (rp *Repo) GetDiplomaByStudent(userid string) ([]Diploma, error) {
 		}
 		ids = append(ids, diplomaId)
 	}
-	//log.Println(diplomas)
-
-	rows, err = rp.db.Query("select d.averageGrade, s.TotalHighPoints, d.yearFinished from Diplomas d, Students s where d.studentId = s.id;")
+	var temp []string
+	var idString string
+	for i := 0; i < len(ids); i++ {
+		temp = append(temp, strconv.Itoa(ids[i]))
+	}
+	idString = strings.Join(temp, ",")
+	//log.Println(idString)
+	var queryString = fmt.Sprintf("%s%s%s", "select d.averageGrade, s.TotalHighPoints, d.yearFinished from Diplomas d, Students s where d.studentId = s.id and d.id in (", idString, ");")
+	rows, err = rp.db.Query(queryString)
 
 	var diplomas []Diploma
 	for rows.Next() {
@@ -61,6 +70,21 @@ func (rp *Repo) GetDiplomaByStudent(userid string) ([]Diploma, error) {
 		}
 		diplomas = append(diplomas, diploma)
 	}
+	for i := 0; i < len(ids); i++ {
+		rows, err = rp.db.Query("select grades, finalGrade from HasSubjects where diplomaId = ?", ids[i])
+
+		for rows.Next() {
+			var subject Subject
+			err := rows.Scan(&subject.Grades, &subject.FinalGrade)
+			if err != nil {
+				return nil, err
+			}
+			diplomas[i].Subjects = append(diplomas[i].Subjects, subject)
+		}
+
+	}
+
+	//log.Println(diplomas)
 	return diplomas, nil
 }
 
@@ -80,7 +104,7 @@ func (rp *Repo) CreateData() error {
 		"id varchar(30) primary key," +
 		"firstName varchar(50)," +
 		"lastName varchar(50)," +
-		"jmbg varchar(50) unique" +
+		"jmbg varchar(50)" +
 		")")
 	if err != nil {
 		return err
@@ -175,9 +199,23 @@ func (rp *Repo) CreateData() error {
 			return err
 		}
 
+		_, err = rp.db.Exec("INSERT INTO Users"+
+			"(id, firstName, lastName, jmbg) VALUES (?, ?, ?, ?)"+
+			"", "117316411448317157040", "Zika", "Zikic", " ")
+		if err != nil {
+			return err
+		}
+
 		_, err = rp.db.Exec("INSERT INTO Students"+
 			"(currentSchoolYear, TotalHighPoints, userId) VALUES (?, ?, ?)"+
 			"", 2, 43.20, "113289113681502612644")
+		if err != nil {
+			return err
+		}
+
+		_, err = rp.db.Exec("INSERT INTO Students"+
+			"(currentSchoolYear, TotalHighPoints, userId) VALUES (?, ?, ?)"+
+			"", 4, 45.20, "117316411448317157040")
 		if err != nil {
 			return err
 		}
@@ -262,6 +300,34 @@ func (rp *Repo) CreateData() error {
 		_, err = rp.db.Exec("INSERT INTO HasSubjects"+
 			"(diplomaId, subjectId, grades, finalGrade) VALUES (?, ?, ?, ?)"+
 			"", 2, 3, "3,2,4", "0")
+		if err != nil {
+			return err
+		}
+
+		_, err = rp.db.Exec("INSERT INTO Diplomas"+
+			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
+			"", 4.30, 2021, 2)
+		if err != nil {
+			return err
+		}
+
+		_, err = rp.db.Exec("INSERT INTO Diplomas"+
+			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
+			"", 4.55, 2022, 2)
+		if err != nil {
+			return err
+		}
+
+		_, err = rp.db.Exec("INSERT INTO Diplomas"+
+			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
+			"", 4.30, 2023, 2)
+		if err != nil {
+			return err
+		}
+
+		_, err = rp.db.Exec("INSERT INTO Diplomas"+
+			"(averageGrade, yearFinished, studentId) VALUES (?, ?, ?)"+
+			"", 4.55, 2024, 2)
 		if err != nil {
 			return err
 		}

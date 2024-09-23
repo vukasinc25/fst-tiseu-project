@@ -4,10 +4,11 @@ import { checkCookie, deleteCookie, getDiplomasByUser } from "./components/api";
 import NavBar from "./header/page";
 import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
+  const [diplomas, setDiplomas] = useState([]);
 
   // const router = useRouter();
   // if (isLoading)
@@ -34,13 +35,17 @@ export default function Home() {
           }),
         })
           .then((res) => res.json())
-          .then((data) => console.log(data));
+          .then((data) => {
+            console.log(data);
+            setDiplomas(data);
+          })
+          .then(() => console.log("object: " + diplomas));
       }
     },
     [user]
   );
 
-  // const isLoggedIn = await checkCookie();
+  const diplomaCards = diplomas!.map((diploma) => {});
 
   return (
     <div>

@@ -1,23 +1,23 @@
 version: "3.8"
 
 services:
-  auth-service:
-    image: auth-service
-    hostname: auth-service
-    build:
-      context: .
-      dockerfile: ./auth-service/Dockerfile
-    restart: always
-    environment:
-      PORT: 8000
-      MONGO_DB_URI: mongodb://root:pass@mongo:27017
-    ports:
-      - "8000:8000"
-    depends_on:
-      mongo:
-        condition: service_healthy
-    networks:
-      - network
+#  auth-service:
+#    image: auth-service
+#    hostname: auth-service
+#    build:
+#      context: .
+#      dockerfile: ./auth-service/Dockerfile
+#    restart: always
+#    environment:
+#      PORT: 8000
+#      MONGO_DB_URI: mongodb://root:pass@mongo:27017
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      mongo:
+#        condition: service_healthy
+#    networks:
+#      - network
 
   fakultet:
     image: fakultet
@@ -53,41 +53,41 @@ services:
       - network
 
     #SLUZBA ZA ZAPOSLJAVANJE
-  profile-service:
-    image: profile-service
-    hostname: profile-service
-    build:
-      context: .
-      dockerfile: SluzbaZaZaposljavanje/backend/profile-service/Dockerfile
-    restart: always
-    environment:
-      PORT: 8011
-      MONGO_DB_URI: mongodb://root:pass@mongo:27017
-    ports:
-      - "8011:8011"
-    depends_on:
-      mongo:
-        condition: service_healthy
-    networks:
-      - network
-
-  job-service:
-    image: job-service
-    hostname: job-service
-    build:
-      context: .
-      dockerfile: SluzbaZaZaposljavanje/backend/job-service/Dockerfile
-    restart: always
-    environment:
-      PORT: 8012
-      MONGO_DB_URI: mongodb://root:pass@mongo:27017
-    ports:
-      - "8012:8012"
-    depends_on:
-      mongo:
-        condition: service_healthy
-    networks:
-      - network
+#  profile-service:
+#    image: profile-service
+#    hostname: profile-service
+#    build:
+#      context: .
+#      dockerfile: SluzbaZaZaposljavanje/backend/profile-service/Dockerfile
+#    restart: always
+#    environment:
+#      PORT: 8011
+#      MONGO_DB_URI: mongodb://root:pass@mongo:27017
+#    ports:
+#      - "8011:8011"
+#    depends_on:
+#      mongo:
+#        condition: service_healthy
+#    networks:
+#      - network
+#
+#  job-service:
+#    image: job-service
+#    hostname: job-service
+#    build:
+#      context: .
+#      dockerfile: SluzbaZaZaposljavanje/backend/job-service/Dockerfile
+#    restart: always
+#    environment:
+#      PORT: 8012
+#      MONGO_DB_URI: mongodb://root:pass@mongo:27017
+#    ports:
+#      - "8012:8012"
+#    depends_on:
+#      mongo:
+#        condition: service_healthy
+#    networks:
+#      - network
 
   mongo:
     image: mongo

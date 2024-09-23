@@ -12,7 +12,13 @@ type RequestBody struct {
 }
 
 type Diploma struct {
-	AverageGrade    float32 `json:"averageGrade"`
-	TotalHighPoints float32 `json:"totalHighPoints"`
-	YearFinished    int     `json:"yearFinished"`
+	AverageGrade    float32   `json:"averageGrade"`
+	TotalHighPoints float32   `json:"totalHighPoints"`
+	YearFinished    int       `json:"yearFinished"`
+	Subjects        []Subject `json:"subjects"`
+}
+
+type Subject struct {
+	Grades     string  `json:"grades"`
+	FinalGrade float32 `json:"finalGrade"`
 }
